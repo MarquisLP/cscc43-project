@@ -1,3 +1,5 @@
+package Controller;
+
 /*
  * Code copied from Main.java provided on the CSCC43 course website.
  */

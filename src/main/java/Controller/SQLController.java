@@ -1,4 +1,4 @@
-package mariadb;
+package Controller;
 
 import java.security.interfaces.RSAKey;
 import java.sql.*;
