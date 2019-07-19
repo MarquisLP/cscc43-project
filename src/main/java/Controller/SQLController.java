@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 public class SQLController {
 	
-	private static final String dbClassName = "com.mysql.jdbc.Driver";
+	private static final String dbClassName = "com.mysql.cj.jdbc.Driver";
 	private static final String CONNECTION = "jdbc:mysql://127.0.0.1/";
     //Object that establishes and keeps the state of our application's
     //connection with the MySQL backend.
