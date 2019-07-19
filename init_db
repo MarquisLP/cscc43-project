@@ -126,6 +126,3 @@ CREATE TABLE UserLogin (
     PRIMARY KEY (Username),
     FOREIGN KEY (SIN) REFERENCES User(SIN)
 );
-
-    FOREIGN KEY (HostSIN) REFERENCES Host(SIN)
-);
