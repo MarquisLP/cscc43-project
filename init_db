@@ -1,0 +1,121 @@
+DROP DATABASE IF EXISTS MyBNB;
+CREATE DATABASE MyBNB;
+USE MyBNB;
+
+CREATE TABLE Listing (
+    ListingId CHAR(20)  NOT NULL,
+    Type VARCHAR(100) NOT NULL,
+    Latitude REAL NOT NULL,
+    Longitude REAL NOT NULL,
+    PRIMARY KEY (ListingId)
+);
+
+CREATE TABLE Availability (
+    ListingID CHAR(20) NOT NULL,
+    StartDate DATETIME DEFAULT CURRENT_TIME_STAMP,
+    EndDate DATETIME DEFAULT CURRENT_TIME_STAMP,
+    Price INT NOT NULL,
+    PRIMARY KEY (StartDate, EndDate),
+    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID)
+);
+
+CREATE TABLE Amenities (
+    ListingId CHAR(20),
+    NumberOfGuests INT DEFAULT 1,
+    Bathrooms REAL DEFAULT 0,
+    Bedrooms INT DEFAULT 0,
+    Beds INT DEFAULT 0,
+    Kitchen INT DEFAULT 0,
+    ParkingSpots INT DEFAULT 0,
+    FOREIGN KEY (ListingId) REFERENCES  Listing(ListingID)
+);
+
+CREATE TABLE Address (
+    Country VARCHAR(20) NOT NULL,
+    PostalCode VARCHAR(10) NOT NULL,
+    City VARCHAR(30) NOT NULL,
+    PRIMARY KEY (Country, PostalCode)
+);
+
+CREATE TABLE User (
+    SIN VARCHAR(20) NOT NULL,
+    Name VARCHAR(30) NOT NULL,
+    Occupation VARCHAR(20),
+    DateOfBirth DATE,
+    PRIMARY KEY (SIN)
+);
+
+CREATE TABLE Host (
+    SIN VARCHAR(20) NOT NULL,
+    FOREIGN KEY (SIN) REFERENCES User(SIN)
+);
+
+CREATE TABLE Renter (
+    SIN VARCHAR(20) NOT NULL,
+    CreditCardNumber CHAR(16),
+    FOREIGN KEY (SIN) REFERENCES User(SIN)
+);
+ 
+CREATE TABLE LocatedAt (
+    LisitngID CHAR(20) NOT NULL,
+    Country VARCHAR(20) NOT NULL,
+    PostalCode VARCHAR(10) NOT NULL,
+    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID),
+    FOREIGN KEY (Country, PostalCode)
+REFERENCES Address(Country, PostalCode)
+);
+
+
+CREATE TABLE ResidesAt (
+    SIN VARCHAR(20) NOT NULL,
+    Country VARCHAR(20) NOT NULL,
+    PostalCode VARCHAR(20) NOT NULL,
+    FOREIGN KEY (SIN) REFERENCES User(SIN),
+    FOREIGN KEY (Country, PostalCode) REFERENCES Address(Country, PostalCode)
+);
+
+CREATE TABLE HostedBy (
+    ListingID Char(20) NOT NULL,
+    SIN VARCHAR(20) NOT NULL,
+    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID),
+    FOREIGN KEY (SIN) REFERENCES Host(SIN)
+);
+
+CREATE TABLE Booking (
+    ListingID CHAR(20) NOT NULL,
+    StartDate DATETIME NOT NULL,
+    EndDate DATETIME NOT NULL,
+    SIN VARCHAR(20) NOT NULL,
+    Cancelled Char(1) DEFAULT ‘N’,
+    FOREIGN KEY (ListingID, StartDate, EndDate) REFERENCES Availability(ListingID, StartDate, EndDate),
+    FOREIGN KEY (SIN) REFERENCES Renter(SIN)
+);
+
+
+CREATE TABLE ListingReview (
+    ListingID CHAR(20) NOT NULL,
+    SIN VARCHAR(20) NOT NULL,
+    Comment VARCHAR(250),
+    Rating INT NOT NULL,
+    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID),
+    FOREIGN KEY (SIN) REFERENCES Renter(SIN)
+);
+
+
+CREATE TABLE HostReview (
+    HostSIN VARCHAR(20) NOT NULL,
+    RenterSIN VARCHAR(20) NOT NULL,
+    Comment VARCHAR(250),
+    Rating INT NOT NULL,
+    FOREIGN KEY (HostSIN) REFERENCES Host(SIN),
+    FOREIGN KEY (RenterSIN) REFERENCES Renter(SIN)
+);
+
+CREATE TABLE RenterReview (
+    HostSIN VARCHAR(20) NOT NULL,
+    RenterSIN VARCHAR(20) NOT NULL,
+    Comment VARCHAR(250),
+    Rating INTEGER NOT NULL,
+    FOREIGN KEY (RenterSIN) REFERENCES Renter(SIN),
+    FOREIGN KEY (HostSIN) REFERENCES Host(SIN)
+);
