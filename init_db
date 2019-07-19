@@ -117,5 +117,15 @@ CREATE TABLE RenterReview (
     Comment VARCHAR(250),
     Rating INTEGER NOT NULL,
     FOREIGN KEY (RenterSIN) REFERENCES Renter(SIN),
+);
+
+CREATE TABLE UserLogin (
+    Username VARCHAR(20) NOT NULL,
+    Password VARCHAR(20) NOT NULL,
+    SIN VARCHAR(20) NOT NULL,
+    PRIMARY KEY (Username),
+    FOREIGN KEY (SIN) REFERENCES User(SIN)
+);
+
     FOREIGN KEY (HostSIN) REFERENCES Host(SIN)
 );
