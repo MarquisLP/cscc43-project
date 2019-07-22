@@ -127,13 +127,11 @@ public class CommandLine {
     // in order to retrieve from the user the credentials with which our program
     // is going to establish a connection with MySQL
 	private String[] getCredentials() {
-		String[] cred = new String[3];
+		String[] cred = new String[2];
 		System.out.print("Username: ");
 		cred[0] = sc.nextLine();
 		System.out.print("Password: ");
 		cred[1] = sc.nextLine();
-		System.out.print("Database: ");
-		cred[2] = sc.nextLine();
 		return cred;
 	}
 	

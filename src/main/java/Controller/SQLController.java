@@ -14,6 +14,7 @@ public class SQLController {
 	
 	private static final String dbClassName = "com.mysql.cj.jdbc.Driver";
 	private static final String CONNECTION = "jdbc:mysql://127.0.0.1/";
+	private static final String DATABASE_NAME = "MyBNB";
     //Object that establishes and keeps the state of our application's
     //connection with the MySQL backend.
 	private Connection conn = null;
@@ -28,7 +29,7 @@ public class SQLController {
 		boolean success = true;
 		String user = cred[0];
 		String pass = cred[1];
-		String connection = CONNECTION + cred[2];
+		String connection = CONNECTION + DATABASE_NAME + "?serverTimezone=UTC";
 		try {
 			conn = DriverManager.getConnection(connection, user, pass);
 			st = conn.createStatement();
