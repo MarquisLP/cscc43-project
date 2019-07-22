@@ -103,6 +103,14 @@ public class CommandLine {
 	}
 	
 	//Private functions
+
+	private static void loginMenu() {
+		System.out.println("=========LOGIN MENU=========");
+		System.out.println("0. Exit");
+		System.out.println("1. Login");
+		System.out.println("2. Signup");
+		System.out.print("Enter option number [0-2]: ");
+	}
 	
 	//Print menu options
 	private static void menu() {
