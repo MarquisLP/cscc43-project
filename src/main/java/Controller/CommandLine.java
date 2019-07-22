@@ -64,9 +64,44 @@ public class CommandLine {
 			System.out.println("******ACCESS GRANTED*******");
 			System.out.println("***************************");
 			System.out.println("");
-			
+
+			System.out.println("Welcome to MyBNB!");
+			System.out.println("In order to use the system, you must first log into an account.");
+
 			String input = "";
 			int choice = -1;
+
+			boolean loginComplete = false;
+			while (!(loginComplete)) {
+				loginMenu();
+				input = sc.nextLine();
+				try {
+					choice = Integer.parseInt(input);
+				}
+				catch (NumberFormatException exception) {
+					System.out.println("Invalid option\n");
+					continue;
+				}
+
+				switch (choice) {
+					case 0:
+					    System.out.println("Goodbye!");
+						System.exit(0);
+						break;
+					case 1:
+						//login();
+                        loginComplete = true;
+						break;
+					case 2:
+						//signup();
+						loginComplete = true;
+						break;
+					default:
+						System.out.println("Invalid option\n");
+						break;
+				}
+			}
+
 			do {
 				menu(); //Print Menu
 				input = sc.nextLine();
