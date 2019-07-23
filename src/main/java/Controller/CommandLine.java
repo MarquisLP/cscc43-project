@@ -1,7 +1,10 @@
 
 package Controller;
 
+import database.UserRepository;
+import database.models.User;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /*
@@ -13,6 +16,8 @@ public class CommandLine {
 	private SQLController sqlMngr = null;
     // 'sc' is needed in order to scan the inputs provided by the user
 	private Scanner sc = null;
+	// 'user' holds account information for the currently-logged in user, which will be used when e.g. posting a listing.
+	private User user = null;
 	
 	//Public functions - CommandLine State Functions
 	
@@ -89,8 +94,7 @@ public class CommandLine {
 						System.exit(0);
 						break;
 					case 1:
-						//login();
-                        loginComplete = true;
+                        loginComplete = login();
 						break;
 					case 2:
 						//signup();
@@ -169,7 +173,27 @@ public class CommandLine {
 		cred[1] = sc.nextLine();
 		return cred;
 	}
-	
+
+	private boolean login() {
+	    System.out.print("Enter SIN (or -1 to return to menu): ");
+		String sin = sc.nextLine();
+		if (sin.equals("-1")) {
+			return false;
+		}
+		while (user == null) {
+			try {
+				user = UserRepository.getUser(sin);
+			}
+			catch (NoSuchElementException exception) {
+				System.out.println("The given SIN is not registered in the system. Please try again.");
+				System.out.print("Enter SIN: ");
+				sin = sc.nextLine();
+			}
+		}
+
+		System.out.println("Login successful!");
+		return true;
+	}
     // Function that handles the feature: "3. Print schema."
 	private void printSchema() {
 		ArrayList<String> schema = sqlMngr.getSchema();
