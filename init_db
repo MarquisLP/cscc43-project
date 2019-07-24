@@ -15,7 +15,7 @@ CREATE TABLE Availability (
     StartDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     EndDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     Price INT NOT NULL,
-    PRIMARY KEY (StartDate, EndDate),
+    PRIMARY KEY (ListingID, StartDate, EndDate),
     FOREIGN KEY (ListingID) REFERENCES Listing(ListingID)
 );
 
