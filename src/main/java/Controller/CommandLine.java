@@ -286,10 +286,12 @@ public class CommandLine {
 
 	private boolean hostMenu() {
 		//TODO: Implement
+        return true;
 	}
 
 	private boolean renterMenu() {
 		//TODO: Implement
+		return true;
 	}
 
     // Function that handles the feature: "3. Print schema."
