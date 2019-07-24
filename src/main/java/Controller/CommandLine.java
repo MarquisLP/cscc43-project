@@ -219,11 +219,13 @@ public class CommandLine {
 			if (dateOfBirth.length() == 0) {
 			    dateOfBirthChosen = true;
 			}
-			try {
-			    dateFormat.parse(dateOfBirth);
-			    dateOfBirthChosen = true;
-			} catch (ParseException exception) {
-				System.out.println("Invalid date format. Please try again.");
+			else {
+				try {
+					dateFormat.parse(dateOfBirth);
+					dateOfBirthChosen = true;
+				} catch (ParseException exception) {
+					System.out.println("Invalid date format. Please try again.");
+				}
 			}
 		}
 
