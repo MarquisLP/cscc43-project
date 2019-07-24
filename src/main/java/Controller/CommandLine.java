@@ -1,8 +1,16 @@
 
 package Controller;
 
+import database.HostRepository;
 import database.UserRepository;
+import database.models.Address;
+import database.models.Host;
+import database.models.Renter;
+import database.RenterRepository;
 import database.models.User;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -97,8 +105,7 @@ public class CommandLine {
                         loginComplete = login();
 						break;
 					case 2:
-						//signup();
-						loginComplete = true;
+						loginComplete = signup();
 						break;
 					default:
 						System.out.println("Invalid option\n");
@@ -194,6 +201,110 @@ public class CommandLine {
 		System.out.println("Login successful!");
 		return true;
 	}
+
+	public boolean signup() {
+	    boolean sinExists = true;
+	    String sin;
+
+	    do {
+			System.out.print("Enter SIN: ");
+			sin = sc.nextLine();
+			try {
+			    UserRepository.getUser(sin);
+			    System.out.println("That SIN already exists in the system.");
+			}
+			catch (NoSuchElementException exception) {
+				sinExists = false;
+			}
+		} while (sinExists);
+
+	    String name = "";
+	    while (name.length() == 0) {
+			System.out.print("Enter name: ");
+			name = sc.nextLine();
+			if (name.length() == 0) {
+			    System.out.println("Name cannot be empty");
+			}
+		}
+
+		String occupation;
+        System.out.print("Enter occupation (optional): ");
+        occupation = sc.nextLine();
+
+		String dateOfBirth = "";
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		boolean dateOfBirthChosen = false;
+	    while (!(dateOfBirthChosen)) {
+			System.out.print("Enter date of birth in YYYY-MM-DD format (optional): ");
+			dateOfBirth = sc.nextLine();
+			if (dateOfBirth.length() == 0) {
+			    dateOfBirthChosen = true;
+			}
+			try {
+			    dateFormat.parse(dateOfBirth);
+			    dateOfBirthChosen = true;
+			} catch (ParseException exception) {
+				System.out.println("Invalid date format. Please try again.");
+			}
+		}
+
+		String postalCode = "";
+	    String city = "";
+		String country = "";
+		while (postalCode.length() == 0) {
+			System.out.print("Enter your address's postal code: ");
+			postalCode = sc.nextLine();
+			if (postalCode.length() == 0) {
+				System.out.println("Postal code cannot be empty");
+			}
+		}
+		while (city.length() == 0) {
+			System.out.print("Enter your address's city: ");
+			city = sc.nextLine();
+			if (city.length() == 0) {
+				System.out.println("City cannot be empty");
+			}
+		}
+		while (country.length() == 0) {
+			System.out.print("Enter your address's country: ");
+			country = sc.nextLine();
+			if (country.length() == 0) {
+				System.out.println("Country cannot be empty");
+			}
+		}
+		Address address = new Address(postalCode.toLowerCase(), city.toLowerCase(), country.toLowerCase());
+
+		boolean isHost;
+	    String accountChoiceString;
+	    System.out.println("What account type are you making?");
+		System.out.print("Enter 'h' for Host, anything else for Renter: ");
+		accountChoiceString = sc.nextLine();
+		isHost = accountChoiceString.toLowerCase().equals("h");
+
+		if (isHost) {
+			Host newHost = new Host(sin, name, dateOfBirth, occupation, address);
+			HostRepository.createHost(newHost);
+			user = newHost;
+		}
+		else {
+			String creditCardNumber;
+            do {
+				System.out.print("Enter your credit card number (digits only): ");
+				creditCardNumber = sc.nextLine();
+				if (!(creditCardNumber.matches("\\d+"))) {
+				    System.out.println("Invalid credit card number.");
+				}
+			} while (!(creditCardNumber).matches("\\d+"));
+
+            Renter newRenter = new Renter(sin, name, dateOfBirth, occupation, address, creditCardNumber);
+            RenterRepository.createRenter(newRenter);
+            user = newRenter;
+		}
+
+		System.out.println("Signup successful!");
+		return true;
+	}
+	
     // Function that handles the feature: "3. Print schema."
 	private void printSchema() {
 		ArrayList<String> schema = sqlMngr.getSchema();
