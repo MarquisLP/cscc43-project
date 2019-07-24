@@ -113,33 +113,12 @@ public class CommandLine {
 				}
 			}
 
-			do {
-				menu(); //Print Menu
-				input = sc.nextLine();
-				try {
-					choice = Integer.parseInt(input);
-					switch (choice) { //Activate the desired functionality
-					case 1:
-						this.insertOperator();
-						break;
-					case 2:
-						this.selectOperator();
-						break;
-					case 3:
-						this.printSchema();
-						break;
-					case 4:
-						this.printColSchema();
-						break;
-					default:
-						break;
-					}
-				} catch (NumberFormatException e) {
-					input = "-1";
-				}
-			} while (input.compareTo("0") != 0);
-			
-			return true;
+			if (user instanceof Host) {
+			    return hostMenu();
+			}
+			else {
+			    return renterMenu();
+			}
 		} else {
 			System.out.println("");
 			System.out.println("Connection could not been established! Bye!");
@@ -304,7 +283,15 @@ public class CommandLine {
 		System.out.println("Signup successful!");
 		return true;
 	}
-	
+
+	private boolean hostMenu() {
+		//TODO: Implement
+	}
+
+	private boolean renterMenu() {
+		//TODO: Implement
+	}
+
     // Function that handles the feature: "3. Print schema."
 	private void printSchema() {
 		ArrayList<String> schema = sqlMngr.getSchema();
