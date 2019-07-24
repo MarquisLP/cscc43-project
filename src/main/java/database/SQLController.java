@@ -145,4 +145,8 @@ public class SQLController {
 		return rows;
 	}
 
+	public PreparedStatement prepareStatement(String statement) throws SQLException {
+		return conn.prepareStatement(statement);
+	}
+
 }
