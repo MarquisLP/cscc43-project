@@ -22,6 +22,19 @@ public class SQLController {
     //desired query from our application and returning the results of this
     //execution the same way that are received from the SQL backend.
 	private Statement st = null;
+	// Singular instance of this object; used for the Singleton pattern.
+	private static SQLController instance = null;
+
+	// Private constructor for Singleton pattern
+	private SQLController() {
+	}
+
+	public static SQLController getInstance() {
+	    if (instance == null) {
+	    	instance = new SQLController();
+		}
+	    return instance;
+	}
 	
     // Initialize current instance of this class.
 	public boolean connect(String[] cred) throws ClassNotFoundException {
