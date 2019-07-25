@@ -10,6 +10,8 @@ import database.models.Renter;
 import database.RenterRepository;
 import database.models.User;
 
+import java.sql.Date;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,7 +41,7 @@ public class CommandLine {
 			sc = new Scanner(System.in);
 		}
 		if (sqlMngr == null) {
-			sqlMngr = new SQLController();
+			sqlMngr = SQLController.getInstance();
 		}
 		try {
 			success = sqlMngr.connect(this.getCredentials());
@@ -176,6 +178,10 @@ public class CommandLine {
 				System.out.print("Enter SIN: ");
 				sin = sc.nextLine();
 			}
+			catch (SQLException exception) {
+				exception.printStackTrace();
+				System.out.println("An error occurred. Please contact your administrator for help.");
+			}
 		}
 
 		System.out.println("Login successful!");
@@ -196,6 +202,11 @@ public class CommandLine {
 			catch (NoSuchElementException exception) {
 				sinExists = false;
 			}
+			catch (SQLException exception) {
+			    exception.printStackTrace();
+				System.out.println("An error occurred. Please contact your administrator for help.");
+				return false;
+			}
 		} while (sinExists);
 
 	    String name = "";
@@ -211,18 +222,19 @@ public class CommandLine {
         System.out.print("Enter occupation (optional): ");
         occupation = sc.nextLine();
 
-		String dateOfBirth = "";
+		String dateOfBirthString = "";
+		Date dateOfBirth = null;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		boolean dateOfBirthChosen = false;
 	    while (!(dateOfBirthChosen)) {
 			System.out.print("Enter date of birth in YYYY-MM-DD format (optional): ");
-			dateOfBirth = sc.nextLine();
-			if (dateOfBirth.length() == 0) {
+			dateOfBirthString = sc.nextLine();
+			if (dateOfBirthString.length() == 0) {
 			    dateOfBirthChosen = true;
 			}
 			else {
 				try {
-					dateFormat.parse(dateOfBirth);
+					dateOfBirth = new Date(dateFormat.parse(dateOfBirthString).getTime());
 					dateOfBirthChosen = true;
 				} catch (ParseException exception) {
 					System.out.println("Invalid date format. Please try again.");
@@ -265,7 +277,14 @@ public class CommandLine {
 
 		if (isHost) {
 			Host newHost = new Host(sin, name, dateOfBirth, occupation, address);
-			HostRepository.createHost(newHost);
+			try {
+				HostRepository.createHost(newHost);
+			}
+			catch (SQLException exception) {
+				exception.printStackTrace();
+				System.out.println("An error occurred. Please contact your administrator for help.");
+			    return false;
+			}
 			user = newHost;
 		}
 		else {
@@ -279,7 +298,14 @@ public class CommandLine {
 			} while (!(creditCardNumber).matches("\\d+"));
 
             Renter newRenter = new Renter(sin, name, dateOfBirth, occupation, address, creditCardNumber);
-            RenterRepository.createRenter(newRenter);
+			try {
+				RenterRepository.createRenter(newRenter);
+			}
+			catch (SQLException exception) {
+				exception.printStackTrace();
+				System.out.println("An error occurred. Please contact your administrator for help.");
+				return false;
+			}
             user = newRenter;
 		}
 
