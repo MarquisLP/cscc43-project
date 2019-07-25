@@ -1,7 +1,21 @@
 
 package Controller;
 
+import database.HostRepository;
+import database.SQLController;
+import database.UserRepository;
+import database.models.Address;
+import database.models.Host;
+import database.models.Renter;
+import database.RenterRepository;
+import database.models.User;
+
+import java.sql.Date;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /*
@@ -13,6 +27,8 @@ public class CommandLine {
 	private SQLController sqlMngr = null;
     // 'sc' is needed in order to scan the inputs provided by the user
 	private Scanner sc = null;
+	// 'user' holds account information for the currently-logged in user, which will be used when e.g. posting a listing.
+	private User user = null;
 	
 	//Public functions - CommandLine State Functions
 	
@@ -25,7 +41,7 @@ public class CommandLine {
 			sc = new Scanner(System.in);
 		}
 		if (sqlMngr == null) {
-			sqlMngr = new SQLController();
+			sqlMngr = SQLController.getInstance();
 		}
 		try {
 			success = sqlMngr.connect(this.getCredentials());
@@ -64,36 +80,48 @@ public class CommandLine {
 			System.out.println("******ACCESS GRANTED*******");
 			System.out.println("***************************");
 			System.out.println("");
-			
+
+			System.out.println("Welcome to MyBNB!");
+			System.out.println("In order to use the system, you must first log into an account.");
+
 			String input = "";
 			int choice = -1;
-			do {
-				menu(); //Print Menu
+
+			boolean loginComplete = false;
+			while (!(loginComplete)) {
+				loginMenu();
 				input = sc.nextLine();
 				try {
 					choice = Integer.parseInt(input);
-					switch (choice) { //Activate the desired functionality
+				}
+				catch (NumberFormatException exception) {
+					System.out.println("Invalid option\n");
+					continue;
+				}
+
+				switch (choice) {
+					case 0:
+					    System.out.println("Goodbye!");
+						System.exit(0);
+						break;
 					case 1:
-						this.insertOperator();
+                        loginComplete = login();
 						break;
 					case 2:
-						this.selectOperator();
-						break;
-					case 3:
-						this.printSchema();
-						break;
-					case 4:
-						this.printColSchema();
+						loginComplete = signup();
 						break;
 					default:
+						System.out.println("Invalid option\n");
 						break;
-					}
-				} catch (NumberFormatException e) {
-					input = "-1";
 				}
-			} while (input.compareTo("0") != 0);
-			
-			return true;
+			}
+
+			if (user instanceof Host) {
+			    return hostMenu();
+			}
+			else {
+			    return renterMenu();
+			}
 		} else {
 			System.out.println("");
 			System.out.println("Connection could not been established! Bye!");
@@ -103,6 +131,14 @@ public class CommandLine {
 	}
 	
 	//Private functions
+
+	private static void loginMenu() {
+		System.out.println("=========LOGIN MENU=========");
+		System.out.println("0. Exit");
+		System.out.println("1. Login");
+		System.out.println("2. Signup");
+		System.out.print("Enter option number [0-2]: ");
+	}
 	
 	//Print menu options
 	private static void menu() {
@@ -119,16 +155,174 @@ public class CommandLine {
     // in order to retrieve from the user the credentials with which our program
     // is going to establish a connection with MySQL
 	private String[] getCredentials() {
-		String[] cred = new String[3];
+		String[] cred = new String[2];
 		System.out.print("Username: ");
 		cred[0] = sc.nextLine();
 		System.out.print("Password: ");
 		cred[1] = sc.nextLine();
-		System.out.print("Database: ");
-		cred[2] = sc.nextLine();
 		return cred;
 	}
-	
+
+	private boolean login() {
+	    System.out.print("Enter SIN (or -1 to return to menu): ");
+		String sin = sc.nextLine();
+		if (sin.equals("-1")) {
+			return false;
+		}
+		while (user == null) {
+			try {
+				user = UserRepository.getUser(sin);
+			}
+			catch (NoSuchElementException exception) {
+				System.out.println("The given SIN is not registered in the system. Please try again.");
+				System.out.print("Enter SIN: ");
+				sin = sc.nextLine();
+			}
+			catch (SQLException exception) {
+				exception.printStackTrace();
+				System.out.println("An error occurred. Please contact your administrator for help.");
+			}
+		}
+
+		System.out.println("Login successful!");
+		return true;
+	}
+
+	public boolean signup() {
+	    boolean sinExists = true;
+	    String sin;
+
+	    do {
+			System.out.print("Enter SIN: ");
+			sin = sc.nextLine();
+			try {
+			    UserRepository.getUser(sin);
+			    System.out.println("That SIN already exists in the system.");
+			}
+			catch (NoSuchElementException exception) {
+				sinExists = false;
+			}
+			catch (SQLException exception) {
+			    exception.printStackTrace();
+				System.out.println("An error occurred. Please contact your administrator for help.");
+				return false;
+			}
+		} while (sinExists);
+
+	    String name = "";
+	    while (name.length() == 0) {
+			System.out.print("Enter name: ");
+			name = sc.nextLine();
+			if (name.length() == 0) {
+			    System.out.println("Name cannot be empty");
+			}
+		}
+
+		String occupation;
+        System.out.print("Enter occupation (optional): ");
+        occupation = sc.nextLine();
+
+		String dateOfBirthString = "";
+		Date dateOfBirth = null;
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		boolean dateOfBirthChosen = false;
+	    while (!(dateOfBirthChosen)) {
+			System.out.print("Enter date of birth in YYYY-MM-DD format (optional): ");
+			dateOfBirthString = sc.nextLine();
+			if (dateOfBirthString.length() == 0) {
+			    dateOfBirthChosen = true;
+			}
+			else {
+				try {
+					dateOfBirth = new Date(dateFormat.parse(dateOfBirthString).getTime());
+					dateOfBirthChosen = true;
+				} catch (ParseException exception) {
+					System.out.println("Invalid date format. Please try again.");
+				}
+			}
+		}
+
+		String postalCode = "";
+	    String city = "";
+		String country = "";
+		while (postalCode.length() == 0) {
+			System.out.print("Enter your address's postal code: ");
+			postalCode = sc.nextLine();
+			if (postalCode.length() == 0) {
+				System.out.println("Postal code cannot be empty");
+			}
+		}
+		while (city.length() == 0) {
+			System.out.print("Enter your address's city: ");
+			city = sc.nextLine();
+			if (city.length() == 0) {
+				System.out.println("City cannot be empty");
+			}
+		}
+		while (country.length() == 0) {
+			System.out.print("Enter your address's country: ");
+			country = sc.nextLine();
+			if (country.length() == 0) {
+				System.out.println("Country cannot be empty");
+			}
+		}
+		Address address = new Address(postalCode.toLowerCase(), city.toLowerCase(), country.toLowerCase());
+
+		boolean isHost;
+	    String accountChoiceString;
+	    System.out.println("What account type are you making?");
+		System.out.print("Enter 'h' for Host, anything else for Renter: ");
+		accountChoiceString = sc.nextLine();
+		isHost = accountChoiceString.toLowerCase().equals("h");
+
+		if (isHost) {
+			Host newHost = new Host(sin, name, dateOfBirth, occupation, address);
+			try {
+				HostRepository.createHost(newHost);
+			}
+			catch (SQLException exception) {
+				exception.printStackTrace();
+				System.out.println("An error occurred. Please contact your administrator for help.");
+			    return false;
+			}
+			user = newHost;
+		}
+		else {
+			String creditCardNumber;
+            do {
+				System.out.print("Enter your credit card number (digits only): ");
+				creditCardNumber = sc.nextLine();
+				if (!(creditCardNumber.matches("\\d+"))) {
+				    System.out.println("Invalid credit card number.");
+				}
+			} while (!(creditCardNumber).matches("\\d+"));
+
+            Renter newRenter = new Renter(sin, name, dateOfBirth, occupation, address, creditCardNumber);
+			try {
+				RenterRepository.createRenter(newRenter);
+			}
+			catch (SQLException exception) {
+				exception.printStackTrace();
+				System.out.println("An error occurred. Please contact your administrator for help.");
+				return false;
+			}
+            user = newRenter;
+		}
+
+		System.out.println("Signup successful!");
+		return true;
+	}
+
+	private boolean hostMenu() {
+		//TODO: Implement
+        return true;
+	}
+
+	private boolean renterMenu() {
+		//TODO: Implement
+		return true;
+	}
+
     // Function that handles the feature: "3. Print schema."
 	private void printSchema() {
 		ArrayList<String> schema = sqlMngr.getSchema();
