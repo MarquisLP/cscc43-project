@@ -3,31 +3,31 @@ CREATE DATABASE MyBNB;
 USE MyBNB;
 
 CREATE TABLE Listing (
-    ListingId CHAR(20)  NOT NULL,
+    ListingID CHAR(20)  NOT NULL,
     Type VARCHAR(100) NOT NULL,
     Latitude REAL NOT NULL,
     Longitude REAL NOT NULL,
-    PRIMARY KEY (ListingId)
+    PRIMARY KEY (ListingID)
 );
 
 CREATE TABLE Availability (
     ListingID CHAR(20) NOT NULL,
-    StartDate DATETIME DEFAULT CURRENT_TIME_STAMP,
-    EndDate DATETIME DEFAULT CURRENT_TIME_STAMP,
+    StartDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    EndDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     Price INT NOT NULL,
-    PRIMARY KEY (StartDate, EndDate),
+    PRIMARY KEY (ListingID, StartDate, EndDate),
     FOREIGN KEY (ListingID) REFERENCES Listing(ListingID)
 );
 
 CREATE TABLE Amenities (
-    ListingId CHAR(20),
+    ListingID CHAR(20),
     NumberOfGuests INT DEFAULT 1,
     Bathrooms REAL DEFAULT 0,
     Bedrooms INT DEFAULT 0,
     Beds INT DEFAULT 0,
     Kitchen INT DEFAULT 0,
     ParkingSpots INT DEFAULT 0,
-    FOREIGN KEY (ListingId) REFERENCES  Listing(ListingID)
+    FOREIGN KEY (ListingID) REFERENCES  Listing(ListingID)
 );
 
 CREATE TABLE Address (
@@ -57,7 +57,7 @@ CREATE TABLE Renter (
 );
  
 CREATE TABLE LocatedAt (
-    LisitngID CHAR(20) NOT NULL,
+    ListingID CHAR(20) NOT NULL,
     Country VARCHAR(20) NOT NULL,
     PostalCode VARCHAR(10) NOT NULL,
     FOREIGN KEY (ListingID) REFERENCES Listing(ListingID),
@@ -86,7 +86,7 @@ CREATE TABLE Booking (
     StartDate DATETIME NOT NULL,
     EndDate DATETIME NOT NULL,
     SIN VARCHAR(20) NOT NULL,
-    Cancelled Char(1) DEFAULT ‘N’,
+    Cancelled CHAR(1) DEFAULT 'N',
     FOREIGN KEY (ListingID, StartDate, EndDate) REFERENCES Availability(ListingID, StartDate, EndDate),
     FOREIGN KEY (SIN) REFERENCES Renter(SIN)
 );
@@ -117,12 +117,5 @@ CREATE TABLE RenterReview (
     Comment VARCHAR(250),
     Rating INTEGER NOT NULL,
     FOREIGN KEY (RenterSIN) REFERENCES Renter(SIN),
-);
-
-CREATE TABLE UserLogin (
-    Username VARCHAR(20) NOT NULL,
-    Password VARCHAR(20) NOT NULL,
-    SIN VARCHAR(20) NOT NULL,
-    PRIMARY KEY (Username),
-    FOREIGN KEY (SIN) REFERENCES User(SIN)
+    FOREIGN KEY (HostSIN) REFERENCES Host(SIN)
 );
