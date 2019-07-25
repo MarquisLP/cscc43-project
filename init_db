@@ -86,7 +86,7 @@ CREATE TABLE Booking (
     StartDate DATETIME NOT NULL,
     EndDate DATETIME NOT NULL,
     SIN VARCHAR(20) NOT NULL,
-    Cancelled CHAR(1) DEFAULT 'N',
+    Cancelled BIT(1) DEFAULT 0,
     FOREIGN KEY (ListingID, StartDate, EndDate) REFERENCES Availability(ListingID, StartDate, EndDate),
     FOREIGN KEY (SIN) REFERENCES Renter(SIN)
 );
