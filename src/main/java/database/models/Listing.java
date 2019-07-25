@@ -79,4 +79,12 @@ public class Listing {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
 }
