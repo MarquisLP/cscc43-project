@@ -64,4 +64,13 @@ public class Amenities {
     public void setParkingSpots(int parkingSpots) {
         this.parkingSpots = parkingSpots;
     }
+
+    public String toString() {
+        return ("Number Of Guests: " + getNumberOfGuests()
+            + "\nBathrooms: " + getBathrooms()
+            + "\nBedrooms: " + getBedrooms()
+            + "Beds: " + getBeds()
+            + "Kitchen: " + getKitchen()
+            + "Parking Spots: " + getParkingSpots());
+    }
 }
