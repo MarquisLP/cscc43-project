@@ -1,0 +1,52 @@
+USE MyBNB;
+
+INSERT INTO Listing (ListingID, Type, Latitude, Longitude)
+    VALUES ("listing", "House", 100, 100);
+
+INSERT INTO Availability (ListingID, StartDate, EndDate, Price)
+    VALUES("listing", "2019-12-01", "2019-12-10", 250);
+
+INSERT INTO Amenities (ListingID, NumberOfGuests, Bathrooms, Bedrooms, Beds, Kitchen, ParkingSpots)
+    VALUES("listing", 1, 1, 1, 1, 1, 1);
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("lhcountry", "lhpostal", "lhcity");
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("rcountry", "rpostal", "rcity");
+
+INSERT INTO User (SIN, Name, Occupation, DateOfBirth)
+    VALUES("hostsin", "hostname", "hostjob", "1994-01-01");
+
+INSERT INTO User (SIN, Name, Occupation, DateOfBirth)
+    VALUES("rentersin", "rentername", "renterjob", "1894-01-01");
+
+INSERT INTO Host (SIN)
+    VALUES("hostsin");
+
+INSERT INTO Renter (SIN, CreditCardNumber)
+    VALUES("rentersin", "creditcardnum");
+
+INSERT INTO LocatedAt (ListingID, Country, PostalCode)
+    VALUES("listing", "lhcountry", "lhpostal");
+
+INSERT INTO ResidesAt (SIN, Country, PostalCode)
+    VALUES("hostsin", "lhcountry", "lhpostal");
+
+INSERT INTO ResidesAt (SIN, Country, PostalCode)
+    VALUES("rentersin", "rcountry", "rpostal");
+
+INSERT INTO HostedBy (ListingID, SIN)
+    VALUES("listing", "hostsin");
+
+INSERT INTO Booking (ListingID, StartDate, EndDate, SIN, Cancelled)
+    VALUES("listing", "2019-12-01", "2019-12-10", "rentersin", 0);
+
+INSERT INTO ListingReview (ListingID, SIN, Comment, Rating)
+    VALUES("listing", "rentersin", "l review", 1);
+
+INSERT INTO HostReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("hostsin", "rentersin", "host review", 2);
+
+INSERT INTO RenterReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("hostsin", "rentersin", "renter review", 3);
