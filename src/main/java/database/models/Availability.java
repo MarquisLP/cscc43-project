@@ -3,37 +3,44 @@ package database.models;
 import java.sql.Timestamp;
 
 public class Availability {
-    Timestamp startDate;
-    Timestamp endDate;
-    int price;
 
-    public Availability(Timestamp startDate, Timestamp endDate, int price) {
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.price = price;
-    }
+  Timestamp startDate;
+  Timestamp endDate;
+  int price;
 
-    public Timestamp getStartDate() {
-        return startDate;
-    }
+  public Availability(Timestamp startDate, Timestamp endDate, int price) {
+    this.startDate = startDate;
+    this.endDate = endDate;
+    this.price = price;
+  }
 
-    public void setStartDate(Timestamp startDate) {
-        this.startDate = startDate;
-    }
+  public Timestamp getStartDate() {
+    return startDate;
+  }
 
-    public Timestamp getEndDate() {
-        return endDate;
-    }
+  public void setStartDate(Timestamp startDate) {
+    this.startDate = startDate;
+  }
 
-    public void setEndDate(Timestamp endDate) {
-        this.endDate = endDate;
-    }
+  public Timestamp getEndDate() {
+    return endDate;
+  }
 
-    public int getPrice() {
-        return price;
-    }
+  public void setEndDate(Timestamp endDate) {
+    this.endDate = endDate;
+  }
 
-    public void setPrice(int price) {
-        this.price = price;
-    }
+  public int getPrice() {
+    return price;
+  }
+
+  public void setPrice(int price) {
+    this.price = price;
+  }
+
+  public String toString() {
+    return ("[Start: " + getStartDate().toString()
+        + ", End: " + getEndDate().toString()
+        + ", Price: " + getPrice() + "]");
+  }
 }

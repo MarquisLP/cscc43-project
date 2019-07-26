@@ -17,4 +17,10 @@ public class Renter extends User {
     public void setCreditCardNumber(String creditCardNumber) {
         this.creditCardNumber = creditCardNumber;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + "\n"
+                + "creditCardNumber: " + getCreditCardNumber();
+    }
 }

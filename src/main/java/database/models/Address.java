@@ -34,4 +34,10 @@ public class Address {
     public void setCountry(String country) {
         this.country = country;
     }
+
+    public String toString() {
+        return ("Country: " + getCountry()
+            + "\nCity: " + getCity()
+            + "\nPostal Code: " + getPostalCode());
+    }
 }
