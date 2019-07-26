@@ -58,4 +58,13 @@ public class User {
     public void setAddress(Address address) {
         this.address = address;
     }
+
+    @Override
+    public String toString() {
+        return "sin: " + getSin() + "\n"
+                + "name: " + getName() + "\n"
+                + "occupation: " + getOccupation() + "\n"
+                + "dateOfBirth: " + getDateOfBirth().toString() + "\n"
+                + getAddress().toString();
+    }
 }
