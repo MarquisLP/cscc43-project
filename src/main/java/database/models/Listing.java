@@ -110,4 +110,39 @@ public class Listing {
     public void setAvailabilities(List<Availability> availabilities) {
         this.availabilities = availabilities;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder returnString = new StringBuilder()
+                .append("listingId: ")
+                .append(getListingId())
+                .append("\n")
+                .append("type: ")
+                .append(getType())
+                .append("\n")
+                .append("latitude: ")
+                .append(getLatitude())
+                .append("\n")
+                .append("longitude: ")
+                .append(getLongitude())
+                .append("\n")
+                .append(getAddress().toString())
+                .append("\n")
+                .append(getAmenities().toString())
+                .append("\n");
+
+        int availibilityIndex = 0;
+        for (Availability availability : getAvailabilities()) {
+            returnString.append(availability);
+            availibilityIndex++;
+            if (availibilityIndex % 5 == 0) {
+                returnString.append("\n");
+            }
+            else {
+                returnString.append(" ");
+            }
+        }
+
+        return returnString.toString();
+    }
 }
