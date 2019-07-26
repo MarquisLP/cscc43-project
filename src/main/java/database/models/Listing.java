@@ -10,21 +10,24 @@ public class Listing {
     private double latitude;
     private double longitude;
     private Address address;
+    private Amenities amenities;
 
-    public Listing(String listingId, String type, double latitude, double longitude, Address address) {
+    public Listing(String listingId, String type, double latitude, double longitude, Address address, Amenities amenities) {
         this.listingId = listingId;
         this.type = type;
         this.latitude = latitude;
         this.longitude = longitude;
         this.address = address;
+        this.amenities = amenities;
     }
 
-    public Listing(String type, double latitude, double longitude, Address address) {
+    public Listing(String type, double latitude, double longitude, Address address, Amenities amenities) {
         this.listingId = generateListingId();
         this.type = type;
         this.latitude = latitude;
         this.longitude = longitude;
         this.address = address;
+        this.amenities = amenities;
     }
 
     /*
@@ -86,5 +89,13 @@ public class Listing {
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public Amenities getAmenities() {
+        return amenities;
+    }
+
+    public void setAmenities(Amenities amenities) {
+        this.amenities = amenities;
     }
 }
