@@ -1,9 +1,6 @@
 package database;
 
-import database.models.Address;
-import database.models.Amenities;
-import database.models.Host;
-import database.models.Listing;
+import database.models.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -112,6 +109,27 @@ public class ListingRepository {
         insertAmenities.setInt(6, newListing.getAmenities().getKitchen());
         insertAmenities.setInt(7, newListing.getAmenities().getParkingSpots());
         insertAmenities.executeUpdate();
+
+        for (Availability availability : newListing.getAvailabilities()) {
+            statementString = String.join(System.getProperty("line.separator"),
+                    "",
+                    "INSERT INTO",
+                    "    Availability(",
+                    "       ListingID",
+                    "       , StartDate",
+                    "       , EndDate",
+                    "       , Price",
+                    "    )",
+                    "VALUES",
+                    "    (?, ?, ?, ?)",
+                    ";");
+            PreparedStatement insertAvailabilityStatement = sqlController.prepareStatement(statementString);
+            insertAvailabilityStatement.setString(1, newListing.getListingId());
+            insertAvailabilityStatement.setTimestamp(2, availability.getStartDate());
+            insertAvailabilityStatement.setTimestamp(3, availability.getEndDate());
+            insertAvailabilityStatement.setInt(4, availability.getPrice());
+            insertAvailabilityStatement.executeUpdate();
+        }
     }
 
     public static Listing getListingById(String listingId) throws SQLException {
@@ -186,6 +204,33 @@ public class ListingRepository {
         );
 
         /*
+         * Get the listing's availabilities.
+         */
+        List<Availability> availabilities = new ArrayList<>();
+        statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "SELECT",
+                "    StartDate",
+                "    , EndDate",
+                "    , Price",
+                "FROM",
+                "    Availability",
+                "WHERE",
+                "    ListingID = ?",
+                ";");
+        PreparedStatement getAvailabilitiesStatement = sqlController.prepareStatement(statementString);
+        getAvailabilitiesStatement.setString(1, listingId);
+        ResultSet availabilityResults = getAvailabilitiesStatement.executeQuery();
+        while (availabilityResults.next()) {
+            Availability availability = new Availability(
+                    availabilityResults.getTimestamp("StartDate"),
+                    availabilityResults.getTimestamp("EndDate"),
+                    availabilityResults.getInt("Price")
+            );
+            availabilities.add(availability);
+        }
+
+        /*
          * Get the listing's general info.
          */
         statementString = String.join(System.getProperty("line.separator"),
@@ -210,7 +255,8 @@ public class ListingRepository {
                 listingResult.getDouble("Latitude"),
                 listingResult.getDouble("Longitude"),
                 address,
-                amenities
+                amenities,
+                availabilities
         );
     }
 
