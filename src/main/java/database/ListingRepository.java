@@ -5,11 +5,8 @@ import database.models.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Random;
 
 public class ListingRepository {
     public static void createListing(Host host, Listing newListing) throws SQLException {
@@ -283,5 +280,42 @@ public class ListingRepository {
         }
 
         return listings;
+    }
+
+    /**
+     * Delete a Listing from the database.
+     * @param listingId ID of the listing to delete.
+     * @throws SQLException if an error occurs while parsing SQL code
+     * @throws NoSuchElementException if no Listing with the given listingID exists
+     * @throws IllegalArgumentException if the given Listing currently has future, uncancelled bookings
+     */
+    public static void deleteListing(String listingId) throws SQLException, NoSuchElementException, IllegalArgumentException {
+        SQLController sqlController = SQLController.getInstance();
+        String statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "DELETE FROM",
+                "    Listing",
+                "WHERE",
+                "    ListingID = ?",
+                ";");
+        PreparedStatement deleteListingStatement = sqlController.prepareStatement(statementString);
+        deleteListingStatement.setString(1, listingId);
+
+        int numRowsDeleted = 0;
+        try {
+            numRowsDeleted = deleteListingStatement.executeUpdate();
+        }
+        catch (SQLException exception) {
+            if (exception.getMessage().equals("REJECTED")) {
+                throw new IllegalArgumentException();
+            }
+            else {
+                throw exception;
+            }
+        }
+
+        if (numRowsDeleted == 0) {
+            throw new NoSuchElementException();
+        }
     }
 }
