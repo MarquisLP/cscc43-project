@@ -121,6 +121,25 @@ CREATE TABLE RenterReview (
 );
 
 DELIMITER //
+CREATE TRIGGER DeleteListingChecker BEFORE DELETE ON Listing
+    FOR EACH ROW
+    BEGIN
+        IF EXISTS (
+            SELECT
+                *
+            FROM
+                Booking AS b
+            WHERE
+                b.ListingID = OLD.ListingID 
+                AND b.Cancelled = 0
+        )
+        THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'REJECTED';
+    END//
+DELIMITER ;
+
+DELIMITER //
 CREATE TRIGGER InsertListingReviewChecker BEFORE INSERT ON ListingReview
     FOR EACH ROW
     BEGIN
