@@ -62,4 +62,14 @@ public class Booking {
   public void setCancelled(boolean cancelled) {
     this.cancelled = cancelled;
   }
+
+  public String toString() {
+    return ("Listing ID: " + getListingID()
+        + "\nStart Date: " + getStartDate()
+        + "\nEnd Date: " + getEndDate()
+        + "\nBooked User SIN: " + getSin()
+        + "\nCancelled: " + isCancelled());
+  }
+
 }
+
