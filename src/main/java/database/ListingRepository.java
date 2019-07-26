@@ -83,6 +83,31 @@ public class ListingRepository {
         insertHostedBy.setString(1, newListing.getListingId());
         insertHostedBy.setString(2, host.getSin());
         insertHostedBy.executeUpdate();
+
+        statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "INSERT INTO",
+                "    Amenities(",
+                "       ListingID",
+                "       , NumberOfGuests",
+                "       , Bathrooms",
+                "       , Bedrooms",
+                "       , Beds",
+                "       , Kitchen",
+                "       , Parkingspots",
+                "    )",
+                "VALUES",
+                "    (?, ?, ?, ?, ?, ?, ?)",
+                ";");
+        PreparedStatement insertAmenities = sqlController.prepareStatement(statementString);
+        insertAmenities.setString(1, newListing.getListingId());
+        insertAmenities.setInt(2, newListing.getAmenities().getNumberOfGuests());
+        insertAmenities.setDouble(3, newListing.getAmenities().getBathrooms());
+        insertAmenities.setInt(4, newListing.getAmenities().getBedrooms());
+        insertAmenities.setInt(5, newListing.getAmenities().getBeds());
+        insertAmenities.setInt(6, newListing.getAmenities().getKitchen());
+        insertAmenities.setInt(7, newListing.getAmenities().getParkingSpots());
+        insertAmenities.executeUpdate();
     }
 
 }

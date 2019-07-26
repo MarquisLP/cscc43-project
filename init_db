@@ -16,7 +16,7 @@ CREATE TABLE Availability (
     EndDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     Price INT NOT NULL,
     PRIMARY KEY (ListingID, StartDate, EndDate),
-    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID)
+    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID) ON DELETE CASCADE
 );
 
 CREATE TABLE Amenities (
@@ -27,7 +27,7 @@ CREATE TABLE Amenities (
     Beds INT DEFAULT 0,
     Kitchen INT DEFAULT 0,
     ParkingSpots INT DEFAULT 0,
-    FOREIGN KEY (ListingID) REFERENCES  Listing(ListingID)
+    FOREIGN KEY (ListingID) REFERENCES  Listing(ListingID) ON DELETE CASCADE
 );
 
 CREATE TABLE Address (
@@ -47,20 +47,20 @@ CREATE TABLE User (
 
 CREATE TABLE Host (
     SIN VARCHAR(20) NOT NULL,
-    FOREIGN KEY (SIN) REFERENCES User(SIN)
+    FOREIGN KEY (SIN) REFERENCES User(SIN) ON DELETE CASCADE
 );
 
 CREATE TABLE Renter (
     SIN VARCHAR(20) NOT NULL,
     CreditCardNumber CHAR(16),
-    FOREIGN KEY (SIN) REFERENCES User(SIN)
+    FOREIGN KEY (SIN) REFERENCES User(SIN) ON DELETE CASCADE
 );
  
 CREATE TABLE LocatedAt (
     ListingID CHAR(20) NOT NULL,
     Country VARCHAR(20) NOT NULL,
     PostalCode VARCHAR(10) NOT NULL,
-    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID),
+    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID) ON DELETE CASCADE,
     FOREIGN KEY (Country, PostalCode)
 REFERENCES Address(Country, PostalCode)
 );
@@ -70,15 +70,15 @@ CREATE TABLE ResidesAt (
     SIN VARCHAR(20) NOT NULL,
     Country VARCHAR(20) NOT NULL,
     PostalCode VARCHAR(20) NOT NULL,
-    FOREIGN KEY (SIN) REFERENCES User(SIN),
+    FOREIGN KEY (SIN) REFERENCES User(SIN) ON DELETE CASCADE,
     FOREIGN KEY (Country, PostalCode) REFERENCES Address(Country, PostalCode)
 );
 
 CREATE TABLE HostedBy (
     ListingID Char(20) NOT NULL,
     SIN VARCHAR(20) NOT NULL,
-    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID),
-    FOREIGN KEY (SIN) REFERENCES Host(SIN)
+    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID) ON DELETE CASCADE,
+    FOREIGN KEY (SIN) REFERENCES Host(SIN) ON DELETE CASCADE
 );
 
 CREATE TABLE Booking (
@@ -87,8 +87,8 @@ CREATE TABLE Booking (
     EndDate DATETIME NOT NULL,
     SIN VARCHAR(20) NOT NULL,
     Cancelled BIT(1) DEFAULT 0,
-    FOREIGN KEY (ListingID, StartDate, EndDate) REFERENCES Availability(ListingID, StartDate, EndDate),
-    FOREIGN KEY (SIN) REFERENCES Renter(SIN)
+    FOREIGN KEY (ListingID, StartDate, EndDate) REFERENCES Availability(ListingID, StartDate, EndDate) ON DELETE CASCADE,
+    FOREIGN KEY (SIN) REFERENCES Renter(SIN) ON DELETE CASCADE
 );
 
 
@@ -97,7 +97,7 @@ CREATE TABLE ListingReview (
     SIN VARCHAR(20) NOT NULL,
     Comment VARCHAR(250),
     Rating INT NOT NULL,
-    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID),
+    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID) ON DELETE CASCADE,
     FOREIGN KEY (SIN) REFERENCES Renter(SIN)
 );
 
@@ -107,7 +107,7 @@ CREATE TABLE HostReview (
     RenterSIN VARCHAR(20) NOT NULL,
     Comment VARCHAR(250),
     Rating INT NOT NULL,
-    FOREIGN KEY (HostSIN) REFERENCES Host(SIN),
+    FOREIGN KEY (HostSIN) REFERENCES Host(SIN) ON DELETE CASCADE,
     FOREIGN KEY (RenterSIN) REFERENCES Renter(SIN)
 );
 
@@ -116,6 +116,32 @@ CREATE TABLE RenterReview (
     RenterSIN VARCHAR(20) NOT NULL,
     Comment VARCHAR(250),
     Rating INTEGER NOT NULL,
-    FOREIGN KEY (RenterSIN) REFERENCES Renter(SIN),
+    FOREIGN KEY (RenterSIN) REFERENCES Renter(SIN) ON DELETE CASCADE,
     FOREIGN KEY (HostSIN) REFERENCES Host(SIN)
 );
+
+DELIMITER //
+CREATE TRIGGER InsertListingReviewChecker BEFORE INSERT ON ListingReview
+    FOR EACH ROW
+    BEGIN
+        IF NOT EXISTS (
+            SELECT
+                *
+            FROM
+                Booking AS b
+                INNER JOIN Availability AS a ON (
+                    a.ListingID = b.ListingID
+                    AND a.StartDate = b.StartDate
+                    AND a.EndDate = b.EndDate
+                )
+            WHERE
+                b.Cancelled = 0
+                AND b.SIN = NEW.SIN
+                AND b.ListingID = NEW.ListingID
+                AND a.EndDate < CURRENT_TIMESTAMP
+        ) THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'REJECTED';
+        END IF;
+    END//
+DELIMITER ;
