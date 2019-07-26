@@ -69,8 +69,8 @@ public class Amenities {
         return ("Number Of Guests: " + getNumberOfGuests()
             + "\nBathrooms: " + getBathrooms()
             + "\nBedrooms: " + getBedrooms()
-            + "Beds: " + getBeds()
-            + "Kitchen: " + getKitchen()
-            + "Parking Spots: " + getParkingSpots());
+            + "\nBeds: " + getBeds()
+            + "\nKitchen: " + getKitchen()
+            + "\nParking Spots: " + getParkingSpots());
     }
 }
