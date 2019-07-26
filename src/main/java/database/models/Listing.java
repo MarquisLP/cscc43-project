@@ -2,6 +2,7 @@ package database.models;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Random;
 
 public class Listing {
@@ -11,23 +12,26 @@ public class Listing {
     private double longitude;
     private Address address;
     private Amenities amenities;
+    private List<Availability> availabilities;
 
-    public Listing(String listingId, String type, double latitude, double longitude, Address address, Amenities amenities) {
+    public Listing(String listingId, String type, double latitude, double longitude, Address address, Amenities amenities, List<Availability> availabilities) {
         this.listingId = listingId;
         this.type = type;
         this.latitude = latitude;
         this.longitude = longitude;
         this.address = address;
         this.amenities = amenities;
+        this.availabilities = availabilities;
     }
 
-    public Listing(String type, double latitude, double longitude, Address address, Amenities amenities) {
+    public Listing(String type, double latitude, double longitude, Address address, Amenities amenities, List<Availability> availabilities) {
         this.listingId = generateListingId();
         this.type = type;
         this.latitude = latitude;
         this.longitude = longitude;
         this.address = address;
         this.amenities = amenities;
+        this.availabilities = availabilities;
     }
 
     /*
@@ -97,5 +101,13 @@ public class Listing {
 
     public void setAmenities(Amenities amenities) {
         this.amenities = amenities;
+    }
+
+    public List<Availability> getAvailabilities() {
+        return availabilities;
+    }
+
+    public void setAvailabilities(List<Availability> availabilities) {
+        this.availabilities = availabilities;
     }
 }

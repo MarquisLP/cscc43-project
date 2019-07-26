@@ -1,13 +1,14 @@
 package database;
 
-import database.models.Host;
-import database.models.Listing;
+import database.models.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Random;
 
 public class ListingRepository {
@@ -108,6 +109,179 @@ public class ListingRepository {
         insertAmenities.setInt(6, newListing.getAmenities().getKitchen());
         insertAmenities.setInt(7, newListing.getAmenities().getParkingSpots());
         insertAmenities.executeUpdate();
+
+        for (Availability availability : newListing.getAvailabilities()) {
+            statementString = String.join(System.getProperty("line.separator"),
+                    "",
+                    "INSERT INTO",
+                    "    Availability(",
+                    "       ListingID",
+                    "       , StartDate",
+                    "       , EndDate",
+                    "       , Price",
+                    "    )",
+                    "VALUES",
+                    "    (?, ?, ?, ?)",
+                    ";");
+            PreparedStatement insertAvailabilityStatement = sqlController.prepareStatement(statementString);
+            insertAvailabilityStatement.setString(1, newListing.getListingId());
+            insertAvailabilityStatement.setTimestamp(2, availability.getStartDate());
+            insertAvailabilityStatement.setTimestamp(3, availability.getEndDate());
+            insertAvailabilityStatement.setInt(4, availability.getPrice());
+            insertAvailabilityStatement.executeUpdate();
+        }
     }
 
+    public static Listing getListingById(String listingId) throws SQLException {
+        SQLController sqlController = SQLController.getInstance();
+
+        /*
+         * Get the listing's address.
+         */
+        String statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "SELECT",
+                "    PostalCode",
+                "    , Country",
+                "FROM",
+                "    LocatedAt",
+                "WHERE",
+                "    ListingID = ?",
+                ";");
+        PreparedStatement getLocatedAtStatement = sqlController.prepareStatement(statementString);
+        getLocatedAtStatement.setString(1, listingId);
+        ResultSet locatedAtResults = getLocatedAtStatement.executeQuery();
+        locatedAtResults.first();
+        statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "SELECT",
+                "    City",
+                "FROM",
+                "    Address",
+                "WHERE",
+                "    PostalCode = ?",
+                "    AND Country = ?",
+                ";");
+        PreparedStatement getAddressStatement = sqlController.prepareStatement(statementString);
+        getAddressStatement.setString(1, locatedAtResults.getString("PostalCode"));
+        getAddressStatement.setString(2, locatedAtResults.getString("Country"));
+        ResultSet addressResults = getAddressStatement.executeQuery();
+        addressResults.first();
+        Address address = new Address(
+                locatedAtResults.getString("PostalCode"),
+                addressResults.getString("City"),
+                locatedAtResults.getString("Country")
+        );
+
+        /*
+         * Get the listing's amenities.
+         */
+        statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "SELECT",
+                "    NumberOfGuests",
+                "    , Bathrooms",
+                "    , Bedrooms",
+                "    , Beds",
+                "    , Kitchen",
+                "    , Parkingspots",
+                "FROM",
+                "    Amenities",
+                "WHERE",
+                "    ListingID = ?",
+                ";");
+        PreparedStatement getAmenitiesStatement = sqlController.prepareStatement(statementString);
+        getAmenitiesStatement.setString(1, listingId);
+        ResultSet amenitiesResult = getAmenitiesStatement.executeQuery();
+        amenitiesResult.first();
+        Amenities amenities = new Amenities(
+                amenitiesResult.getInt("NumberOfGuests"),
+                amenitiesResult.getDouble("Bathrooms"),
+                amenitiesResult.getInt("Bedrooms"),
+                amenitiesResult.getInt("Beds"),
+                amenitiesResult.getInt("Kitchen"),
+                amenitiesResult.getInt("ParkingSpots")
+        );
+
+        /*
+         * Get the listing's availabilities.
+         */
+        List<Availability> availabilities = new ArrayList<>();
+        statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "SELECT",
+                "    StartDate",
+                "    , EndDate",
+                "    , Price",
+                "FROM",
+                "    Availability",
+                "WHERE",
+                "    ListingID = ?",
+                ";");
+        PreparedStatement getAvailabilitiesStatement = sqlController.prepareStatement(statementString);
+        getAvailabilitiesStatement.setString(1, listingId);
+        ResultSet availabilityResults = getAvailabilitiesStatement.executeQuery();
+        while (availabilityResults.next()) {
+            Availability availability = new Availability(
+                    availabilityResults.getTimestamp("StartDate"),
+                    availabilityResults.getTimestamp("EndDate"),
+                    availabilityResults.getInt("Price")
+            );
+            availabilities.add(availability);
+        }
+
+        /*
+         * Get the listing's general info.
+         */
+        statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "SELECT",
+                "    Type",
+                "    , Longitude",
+                "    , Latitude",
+                "FROM",
+                "    Listing",
+                "WHERE",
+                "    ListingID = ?",
+                ";");
+        PreparedStatement getListingStatement = sqlController.prepareStatement(statementString);
+        getListingStatement.setString(1, listingId);
+        ResultSet listingResult = getListingStatement.executeQuery();
+        listingResult.first();
+
+        return new Listing(
+                listingId,
+                listingResult.getString("Type"),
+                listingResult.getDouble("Latitude"),
+                listingResult.getDouble("Longitude"),
+                address,
+                amenities,
+                availabilities
+        );
+    }
+
+    public static List<Listing> getAllListingsForHost(String sin) throws SQLException {
+        List<Listing> listings = new ArrayList<>();
+        SQLController sqlController = SQLController.getInstance();
+
+        String statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "SELECT",
+                "    ListingID",
+                "FROM",
+                "    HostedBy",
+                "WHERE",
+                "    SIN = ?",
+                ";");
+        PreparedStatement getHostedByStatement = sqlController.prepareStatement(statementString);
+        getHostedByStatement.setString(1, sin);
+        ResultSet hostedByResults = getHostedByStatement.executeQuery();
+
+        while (hostedByResults.next()) {
+            String listingId = hostedByResults.getString("ListingID");
+            listings.add(getListingById(listingId));
+        }
+
+        return listings;
+    }
 }
