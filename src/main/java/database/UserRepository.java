@@ -15,8 +15,9 @@ public class UserRepository {
 
   public static User getUser(String sin)
       throws NoSuchElementException, SQLException {
-    SQLController sqlController = SQLController.getInstance();
 
+
+    SQLController sqlController = SQLController.getInstance();
 
         /*
         This gets from the USER table the user object and address object.
