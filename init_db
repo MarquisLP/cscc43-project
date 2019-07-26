@@ -119,3 +119,29 @@ CREATE TABLE RenterReview (
     FOREIGN KEY (RenterSIN) REFERENCES Renter(SIN) ON DELETE CASCADE,
     FOREIGN KEY (HostSIN) REFERENCES Host(SIN)
 );
+
+DELIMITER //
+CREATE TRIGGER InsertListingReviewChecker BEFORE INSERT ON ListingReview
+    FOR EACH ROW
+    BEGIN
+        IF NOT EXISTS (
+            SELECT
+                *
+            FROM
+                Booking AS b
+                INNER JOIN Availability AS a ON (
+                    a.ListingID = b.ListingID
+                    AND a.StartDate = b.StartDate
+                    AND a.EndDate = b.EndDate
+                )
+            WHERE
+                b.Cancelled = 0
+                AND b.SIN = NEW.SIN
+                AND b.ListingID = NEW.ListingID
+                AND a.EndDate < CURRENT_TIMESTAMP
+        ) THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'REJECTED';
+        END IF;
+    END//
+DELIMITER ;
