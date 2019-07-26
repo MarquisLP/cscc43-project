@@ -135,7 +135,7 @@ public class Listing {
         for (Availability availability : getAvailabilities()) {
             returnString.append(availability);
             availibilityIndex++;
-            if (availibilityIndex % 5 == 0) {
+            if (availibilityIndex % 3 == 0) {
                 returnString.append("\n");
             }
             else {

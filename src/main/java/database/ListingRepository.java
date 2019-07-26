@@ -214,9 +214,20 @@ public class ListingRepository {
                 "    Availability",
                 "WHERE",
                 "    ListingID = ?",
+                "    AND NOT EXISTS (",
+                "       SELECT",
+                "           *",
+                "       FROM",
+                "           Booking",
+                "       WHERE",
+                "           Booking.ListingID = ?",
+                "           AND Booking.StartDate = Availability.StartDate",
+                "           AND Booking.EndDate = Availability.EndDate",
+                "    )",
                 ";");
         PreparedStatement getAvailabilitiesStatement = sqlController.prepareStatement(statementString);
         getAvailabilitiesStatement.setString(1, listingId);
+        getAvailabilitiesStatement.setString(2, listingId);
         ResultSet availabilityResults = getAvailabilitiesStatement.executeQuery();
         while (availabilityResults.next()) {
             Availability availability = new Availability(
