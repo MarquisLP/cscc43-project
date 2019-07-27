@@ -5,6 +5,8 @@ import database.models.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.NoSuchElementException;
 
 public class BookingRepository {
@@ -34,7 +36,7 @@ public class BookingRepository {
         "FROM",
         "    Availability",
         "WHERE",
-        "    Availability.Listing = ?",
+        "    Availability.ListingID = ?",
         "    AND Availability.StartDate = ?",
         "    AND Availability.EndDate = ?",
         ";");
@@ -101,7 +103,7 @@ public class BookingRepository {
         "FROM",
         "    Booking",
         "WHERE",
-        "    Booking.Listing = ?",
+        "    Booking.ListingID = ?",
         "    AND Booking.StartDate = ?",
         "    AND Booking.EndDate = ?",
         "    AND Booking.SIN = ?",
@@ -123,8 +125,10 @@ public class BookingRepository {
       booking = new Booking();
       resultSet.first();
       booking.setListingID(resultSet.getString("ListingID"));
-      booking.setStartDate(resultSet.getTimestamp("StartDate"));
-      booking.setEndDate(resultSet.getTimestamp("EndDate"));
+      Timestamp starttime = (resultSet.getTimestamp("StartDate"));
+      booking.setStartDate(starttime);
+      Timestamp endtime = (resultSet.getTimestamp("EndDate"));
+      booking.setEndDate(endtime);
       booking.setSin(resultSet.getString("SIN"));
       booking.setCancelled(resultSet.getBoolean("Cancelled"));
     }
@@ -155,7 +159,7 @@ public class BookingRepository {
       throw new NoSuchElementException();
     }
 
-    if booking.equals(null) {
+    if (booking.equals(null)) {
       throw new NoSuchElementException();
     }
 
@@ -169,7 +173,7 @@ public class BookingRepository {
         "SET",
         "    Cancelled = ?",
         "WHERE",
-        "    Booking.Listing = ?",
+        "    Booking.ListingID = ?",
         "    AND Booking.StartDate = ?",
         "    AND Booking.EndDate = ?",
         "    AND Booking.SIN = ?",
@@ -181,7 +185,7 @@ public class BookingRepository {
     updateBookingStatement.setTimestamp(3, booking.getStartDate());
     updateBookingStatement.setTimestamp(4, booking.getEndDate());
     updateBookingStatement.setString(5, booking.getSin());
-    ResultSet resultSet = updateBookingStatement.executeQuery();
+    updateBookingStatement.executeUpdate();
   }
 
 
@@ -207,7 +211,7 @@ public class BookingRepository {
       throw new NoSuchElementException();
     }
 
-    if booking.equals(null) {
+    if(booking.equals(null)) {
       throw new NoSuchElementException();
     }
 
@@ -219,7 +223,7 @@ public class BookingRepository {
         "DELETE FROM",
         "    Booking",
         "WHERE",
-        "    Booking.Listing = ?",
+        "    Booking.ListingID = ?",
         "    AND Booking.StartDate = ?",
         "    AND Booking.EndDate = ?",
         "    AND Booking.SIN = ?",
@@ -230,6 +234,6 @@ public class BookingRepository {
     updateBookingStatement.setTimestamp(2, booking.getStartDate());
     updateBookingStatement.setTimestamp(3, booking.getEndDate());
     updateBookingStatement.setString(4, booking.getSin());
-    ResultSet resultSet = updateBookingStatement.executeQuery();
+    updateBookingStatement.executeUpdate();
   }
 }

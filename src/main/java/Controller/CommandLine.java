@@ -1,6 +1,7 @@
 
 package Controller;
 
+import database.BookingRepository;
 import database.HostRepository;
 import database.SQLController;
 import database.UserRepository;
@@ -321,7 +322,39 @@ public class CommandLine {
   private boolean renterMenu() {
     //TODO: change this to the proper one
     System.out.println("BOOKING TESTING!!!!!!!!!!!!!!");
-    RenterRepository.booking();
+    try {
+
+      User user = UserRepository.getUser("testrsin");
+
+      System.out.println("USERRRRRRRRRR!!!!!!!!!!!!!!");
+      System.out.println(user.toString());
+
+      BookingRepository
+          .booking("testlisting", "2019-12-01", "2019-12-10", user);
+      Booking booking = BookingRepository
+          .getBooking("testlisting", "2019-12-01", "2019-12-10", user);
+
+      System.out.println("BOOKING!!!!!!!!!!!!!!");
+      System.out.println(booking.toString());
+
+      BookingRepository
+          .cancelBooking("testlisting", "2019-12-01", "2019-12-10", user);
+      booking = BookingRepository
+          .getBooking("testlisting", "2019-12-01", "2019-12-10", user);
+
+      System.out.println("CANCELLED TESTING!!!!!!!!!!!!!!");
+      System.out.println(booking.toString());
+
+      BookingRepository
+          .deleteBooking("testlisting", "2019-12-01", "2019-12-10", user);
+
+      System.out.println("DELETE TESTING!!!!!!!!!!!!!!");
+
+    } catch (Exception exception) {
+      System.out.println("OH NO");
+      exception.printStackTrace();
+      return true;
+    }
     return true;
   }
 
