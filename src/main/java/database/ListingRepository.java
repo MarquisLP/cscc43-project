@@ -593,4 +593,142 @@ public class ListingRepository {
 
         return availabilities;
     }
+
+    public static List<Availability> getListingsNearPostalCode(String postalCode,
+                                                               ListingQueryOptions queryOptions) throws SQLException {
+        List<Availability> availabilities = new ArrayList<>();
+
+        SQLController sqlController = SQLController.getInstance();
+        // Latitude-Longitude distance calculation query from Kaletha on StackOverflow:
+        // https://stackoverflow.com/a/5548877
+        String statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "SELECT",
+                "    l.ListingID",
+                "    , av.StartDate",
+                "    , av.EndDate",
+                "    , av.Price",
+                "FROM",
+                "   Listing AS l",
+                "   INNER JOIN LocatedAt AS la ON la.ListingID = l.ListingID",
+                "   INNER JOIN Availability AS av ON av.ListingID = l.ListingID",
+                "   INNER JOIN Amenities AS am ON am.ListingID = l.ListingID",
+                "WHERE",
+                "   la.PostalCode LIKE ?",
+                "   AND ((? is NULL) OR (l.Type = ?))",
+                "   AND ((? is NULL) OR (av.Price <= ?))",
+                "   AND ((? is NULL) OR (am.NumberOfGuests <= ?))",
+                "   AND ((? is NULL) OR (am.Bathrooms <= ?))",
+                "   AND ((? is NULL) OR (am.Bedrooms <= ?))",
+                "   AND ((? is NULL) OR (am.Beds <= ?))",
+                "   AND ((? is NULL) OR (am.Kitchen <= ?))",
+                "   AND ((? is NULL) OR (am.ParkingSpots <= ?))",
+                "   AND ((? is NULL) OR (av.StartDate >= ?))",
+                "   AND ((? is NULL) OR (av.EndDate <= ?))"
+                );
+        if (queryOptions.getSortOrder().equals(SortOrder.ASCENDING)) {
+            statementString += "ORDER BY av.Price ASC";
+        }
+        else if (queryOptions.getSortOrder().equals(SortOrder.DESCENDING)) {
+            statementString += "ORDER BY av.Price DESC";
+        }
+        PreparedStatement getListingsStatement = sqlController.prepareStatement(statementString);
+        getListingsStatement.setString(1, postalCode.toLowerCase().substring(0, 3) + "%");
+
+        // Optional query filters
+        if (queryOptions.getType() == null) {
+            getListingsStatement.setNull(2, Types.VARCHAR);
+            getListingsStatement.setNull(3, Types.VARCHAR);
+        }
+        else {
+            getListingsStatement.setString(2, queryOptions.getType());
+            getListingsStatement.setString(3, queryOptions.getType());
+        }
+        if (queryOptions.getMaxPrice() == null) {
+            getListingsStatement.setNull(4, Types.INTEGER);
+            getListingsStatement.setNull(5, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(4, queryOptions.getMaxPrice());
+            getListingsStatement.setInt(5, queryOptions.getMaxPrice());
+        }
+        if (queryOptions.getMinNumberOfGuests() == null) {
+            getListingsStatement.setNull(6, Types.INTEGER);
+            getListingsStatement.setNull(7, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(6, queryOptions.getMinNumberOfGuests());
+            getListingsStatement.setInt(7, queryOptions.getMinNumberOfGuests());
+        }
+        if (queryOptions.getMinBathrooms() == null) {
+            getListingsStatement.setNull(8, Types.DOUBLE);
+            getListingsStatement.setNull(9, Types.DOUBLE);
+        }
+        else {
+            getListingsStatement.setDouble(8, queryOptions.getMinBathrooms());
+            getListingsStatement.setDouble(9, queryOptions.getMinBathrooms());
+        }
+        if (queryOptions.getMinBedrooms() == null) {
+            getListingsStatement.setNull(10, Types.INTEGER);
+            getListingsStatement.setNull(11, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(10, queryOptions.getMinBedrooms());
+            getListingsStatement.setInt(11, queryOptions.getMinBedrooms());
+        }
+        if (queryOptions.getMinBeds() == null) {
+            getListingsStatement.setNull(12, Types.INTEGER);
+            getListingsStatement.setNull(13, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(12, queryOptions.getMinBeds());
+            getListingsStatement.setInt(13, queryOptions.getMinBeds());
+        }
+        if (queryOptions.getMinKitchens() == null) {
+            getListingsStatement.setNull(14, Types.INTEGER);
+            getListingsStatement.setNull(15, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(14, queryOptions.getMinKitchens());
+            getListingsStatement.setInt(15, queryOptions.getMinKitchens());
+        }
+        if (queryOptions.getMinParkingSpots() == null) {
+            getListingsStatement.setNull(16, Types.INTEGER);
+            getListingsStatement.setNull(17, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(16, queryOptions.getMinParkingSpots());
+            getListingsStatement.setInt(17, queryOptions.getMinParkingSpots());
+        }
+        if (queryOptions.getStartDate() == null) {
+            getListingsStatement.setNull(18, Types.INTEGER);
+            getListingsStatement.setNull(19, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setTimestamp(18, queryOptions.getStartDate());
+            getListingsStatement.setTimestamp(19, queryOptions.getStartDate());
+        }
+        if (queryOptions.getEndDate() == null) {
+            getListingsStatement.setNull(20, Types.INTEGER);
+            getListingsStatement.setNull(21, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setTimestamp(20, queryOptions.getEndDate());
+            getListingsStatement.setTimestamp(21, queryOptions.getEndDate());
+        }
+
+        ResultSet getListingResults = getListingsStatement.executeQuery();
+
+        while (getListingResults.next()) {
+            Availability availability = new Availability(
+                    getListingResults.getString("ListingID"),
+                    getListingResults.getTimestamp("StartDate"),
+                    getListingResults.getTimestamp("EndDate"),
+                    getListingResults.getInt("Price")
+            );
+            availabilities.add(availability);
+        }
+
+        return availabilities;
+    }
 }
