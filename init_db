@@ -136,6 +136,7 @@ CREATE TRIGGER DeleteListingChecker BEFORE DELETE ON Listing
         THEN
             SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'REJECTED';
+        END IF;
     END//
 DELIMITER ;
 
@@ -159,6 +160,28 @@ CREATE TRIGGER InsertListingReviewChecker BEFORE INSERT ON ListingReview
                 AND b.ListingID = NEW.ListingID
                 AND a.EndDate < CURRENT_TIMESTAMP
         ) THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'REJECTED';
+        END IF;
+    END//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER UpdateAvailabilityChecker BEFORE UPDATE ON Availability
+    FOR EACH ROW
+    BEGIN
+        IF EXISTS (
+            SELECT
+                *
+            FROM
+                Booking AS b
+            WHERE
+                b.ListingID = OLD.ListingID 
+                AND b.StartDate = OLD.StartDate
+                AND b.EndDate = OLD.EndDate
+                AND b.Cancelled = 0
+        )
+        THEN
             SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'REJECTED';
         END IF;
