@@ -338,15 +338,15 @@ public class CommandLine {
       System.out.println(booking.toString());
 
       BookingRepository
-          .cancelBooking("testlisting", "2019-12-01", "2019-12-10", user);
+          .cancelBooking("testlisting", "2018-12-01", "2018-12-10", user);
       booking = BookingRepository
-          .getBooking("testlisting", "2019-12-01", "2019-12-10", user);
+          .getBooking("testlisting", "2018-12-01", "2018-12-10", user);
 
       System.out.println("CANCELLED TESTING!!!!!!!!!!!!!!");
       System.out.println(booking.toString());
 
       BookingRepository
-          .deleteBooking("testlisting", "2019-12-01", "2019-12-10", user);
+          .deleteBooking("testlisting", "2018-12-01", "2018-12-10", user);
 
       System.out.println("DELETE TESTING!!!!!!!!!!!!!!");
 
