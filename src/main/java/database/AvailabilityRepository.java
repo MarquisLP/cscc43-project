@@ -136,4 +136,59 @@ public class AvailabilityRepository {
             throw new NoSuchElementException();
         }
     }
+
+    /**
+     * Creates a new Availability.
+     * @param availability The Availability that will be created
+     * @throws SQLException if there is a parse error in the SQL code
+     * @throws UnsupportedOperationException if availability's start date is later than its end date
+     * @throws IndexOutOfBoundsException if availability's date range would conflict with an existing Availability for the same listing
+     */
+    public static void createAvailability(Availability availability)
+            throws SQLException, UnsupportedOperationException, IndexOutOfBoundsException {
+        if (availability.getStartDate().after(availability.getEndDate())) {
+            throw new UnsupportedOperationException();
+        }
+        SQLController sqlController = SQLController.getInstance();
+        String statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "SELECT",
+                "    *",
+                "FROM",
+                "    Availability",
+                "WHERE",
+                "    ListingID = ?",
+                "    AND (((StartDate >= ?) AND (StartDate <= ?)) OR ((EndDate <= ?) AND (EndDate >= ?))",
+                "         OR ((StartDate <= ?) AND (EndDate >= ?)) OR ((EndDate >= ?) AND (StartDate <= ?)))",
+                ";");
+        PreparedStatement getAvailabilitiesStatement = sqlController.prepareStatement(statementString);
+        getAvailabilitiesStatement.setString(1, availability.getListingId());
+        getAvailabilitiesStatement.setTimestamp(2, availability.getStartDate());
+        getAvailabilitiesStatement.setTimestamp(3, availability.getEndDate());
+        getAvailabilitiesStatement.setTimestamp(4, availability.getEndDate());
+        getAvailabilitiesStatement.setTimestamp(5, availability.getStartDate());
+        getAvailabilitiesStatement.setTimestamp(6, availability.getStartDate());
+        getAvailabilitiesStatement.setTimestamp(7, availability.getStartDate());
+        getAvailabilitiesStatement.setTimestamp(8, availability.getEndDate());
+        getAvailabilitiesStatement.setTimestamp(9, availability.getEndDate());
+        ResultSet getAvailabilitiesResults = getAvailabilitiesStatement.executeQuery();
+        if (getAvailabilitiesResults.next()) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "INSERT INTO",
+                "    Availability",
+                "       (ListingID, StartDate, EndDate, Price)",
+                "    VALUES",
+                "       (?, ?, ?, ?)",
+                ";");
+        PreparedStatement insertAvailabilityStatement = sqlController.prepareStatement(statementString);
+        insertAvailabilityStatement.setString(1, availability.getListingId());
+        insertAvailabilityStatement.setTimestamp(2, availability.getStartDate());
+        insertAvailabilityStatement.setTimestamp(3, availability.getEndDate());
+        insertAvailabilityStatement.setInt(4, availability.getPrice());
+        insertAvailabilityStatement.executeUpdate();
+    }
 }
