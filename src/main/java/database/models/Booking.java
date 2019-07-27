@@ -12,6 +12,8 @@ public class Booking {
   String sin;
   boolean cancelled;
 
+  public Booking() {
+  }
 
   public Booking(String listingID, Timestamp startDate, Timestamp endDate,
       String sin, boolean cancelled) {
