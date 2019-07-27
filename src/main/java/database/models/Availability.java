@@ -4,14 +4,24 @@ import java.sql.Timestamp;
 
 public class Availability {
 
+  String listingId;
   Timestamp startDate;
   Timestamp endDate;
   int price;
 
-  public Availability(Timestamp startDate, Timestamp endDate, int price) {
+  public Availability(String listingId, Timestamp startDate, Timestamp endDate, int price) {
+    this.listingId = listingId;
     this.startDate = startDate;
     this.endDate = endDate;
     this.price = price;
+  }
+
+  public String getListingId() {
+    return listingId;
+  }
+
+  public void setListingId(String listingId) {
+    this.listingId = listingId;
   }
 
   public Timestamp getStartDate() {
