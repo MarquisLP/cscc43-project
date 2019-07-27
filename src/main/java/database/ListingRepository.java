@@ -2,13 +2,125 @@ package database;
 
 import database.models.*;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
-import java.text.SimpleDateFormat;
 
 public class ListingRepository {
+    public static class ListingQueryOptions {
+        private String type = null;
+        private Integer maxPrice = null;
+        private Integer minNumberOfGuests = null;
+        private Double minBathrooms = null;
+        private Integer minBedrooms = null;
+        private Integer minBeds = null;
+        private Integer minKitchens = null;
+        private Integer minParkingSpots = null;
+        private SortOrder sortOrder = SortOrder.ASCENDING;
+        private Timestamp startDate = null;
+        private Timestamp endDate = null;
+
+        public ListingQueryOptions() {
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public Integer getMaxPrice() {
+            return maxPrice;
+        }
+
+        public void setMaxPrice(Integer maxPrice) {
+            this.maxPrice = maxPrice;
+        }
+
+        public Integer getMinNumberOfGuests() {
+            return minNumberOfGuests;
+        }
+
+        public void setMinNumberOfGuests(Integer minNumberOfGuests) {
+            this.minNumberOfGuests = minNumberOfGuests;
+        }
+
+        public Double getMinBathrooms() {
+            return minBathrooms;
+        }
+
+        public void setMinBathrooms(Double minBathrooms) {
+            this.minBathrooms = minBathrooms;
+        }
+
+        public Integer getMinBedrooms() {
+            return minBedrooms;
+        }
+
+        public void setMinBedrooms(Integer minBedrooms) {
+            this.minBedrooms = minBedrooms;
+        }
+
+        public Integer getMinBeds() {
+            return minBeds;
+        }
+
+        public void setMinBeds(Integer minBeds) {
+            this.minBeds = minBeds;
+        }
+
+        public Integer getMinKitchens() {
+            return minKitchens;
+        }
+
+        public void setMinKitchens(Integer minKitchens) {
+            this.minKitchens = minKitchens;
+        }
+
+        public Integer getMinParkingSpots() {
+            return minParkingSpots;
+        }
+
+        public void setMinParkingSpots(Integer minParkingSpots) {
+            this.minParkingSpots = minParkingSpots;
+        }
+
+        public SortOrder getSortOrder() {
+            return sortOrder;
+        }
+
+        public void setSortOrder(SortOrder sortOrder) {
+            this.sortOrder = sortOrder;
+        }
+
+        public Timestamp getStartDate() {
+            return startDate;
+        }
+
+        public void setStartDate(Timestamp startDate) {
+            this.startDate = startDate;
+        }
+
+        public Timestamp getEndDate() {
+            return endDate;
+        }
+
+        public void setEndDate(Timestamp endDate) {
+            this.endDate = endDate;
+        }
+    }
+
+    public enum SortField {
+        PRICE,
+        DISTANCE
+    }
+
+    public enum SortOrder {
+        ASCENDING,
+        DESCENDING
+    }
+
     public static void createListing(Host host, Listing newListing) throws SQLException {
         SQLController sqlController = SQLController.getInstance();
 
@@ -331,8 +443,9 @@ public class ListingRepository {
         }
     }
 
-    public static List<Listing> getListingsWithinDistance(double latitude, double longitude, double distance) throws SQLException {
-        List<Listing> listings = new ArrayList<>();
+    public static List<Availability> getListingsWithinDistance(double latitude, double longitude, double distance,
+                                                          SortField sortField, ListingQueryOptions queryOptions) throws SQLException {
+        List<Availability> availabilities = new ArrayList<>();
 
         SQLController sqlController = SQLController.getInstance();
         // Latitude-Longitude distance calculation query from Kaletha on StackOverflow:
@@ -340,25 +453,144 @@ public class ListingRepository {
         String statementString = String.join(System.getProperty("line.separator"),
                 "",
                 "SELECT",
-                "    ListingID",
+                "    l.ListingID",
+                "    , av.StartDate",
+                "    , av.EndDate",
+                "    , av.Price",
                 "    , SQRT(",
-                "        POW(69.1 * (Latitude - ?), 2)",
-                "        + POW(69.1 * (? - Longitude) * COS(Latitude / 57.3), 2)) AS Distance",
+                "        POW(69.1 * (l.Latitude - ?), 2)",
+                "        + POW(69.1 * (? - l.Longitude) * COS(l.Latitude / 57.3), 2)) AS Distance",
                 "FROM",
-                "   Listing",
+                "   Listing AS l",
+                "   INNER JOIN Availability AS av ON av.ListingID = l.ListingID",
+                "   INNER JOIN Amenities AS am ON am.ListingID = l.ListingID",
+                "WHERE",
+                "   ((? is NULL) OR (l.Type = ?))",
+                "   AND ((? is NULL) OR (av.Price <= ?))",
+                "   AND ((? is NULL) OR (am.NumberOfGuests <= ?))",
+                "   AND ((? is NULL) OR (am.Bathrooms <= ?))",
+                "   AND ((? is NULL) OR (am.Bedrooms <= ?))",
+                "   AND ((? is NULL) OR (am.Beds <= ?))",
+                "   AND ((? is NULL) OR (am.Kitchen <= ?))",
+                "   AND ((? is NULL) OR (am.ParkingSpots <= ?))",
+                "   AND ((? is NULL) OR (av.StartDate >= ?))",
+                "   AND ((? is NULL) OR (av.EndDate <= ?))",
                 "HAVING",
-                "   Distance * 1.609344 < ?",
-                ";");
-        PreparedStatement deleteListingStatement = sqlController.prepareStatement(statementString);
-        deleteListingStatement.setDouble(1, latitude);
-        deleteListingStatement.setDouble(2, longitude);
-        deleteListingStatement.setDouble(3, distance);
-        ResultSet getListingResults = deleteListingStatement.executeQuery();
+                "   Distance * 1.609344 < ?"
+                );
+        if (sortField.equals(SortField.DISTANCE)) {
+            statementString += "\nORDER BY Distance ";
+        }
+        else if (sortField.equals(SortField.PRICE)) {
+            statementString += "\nORDER BY av.Price ";
+        }
+        if (queryOptions.getSortOrder().equals(SortOrder.ASCENDING)) {
+            statementString += "ASC";
+        }
+        else if (queryOptions.getSortOrder().equals(SortOrder.DESCENDING)) {
+            statementString += "DESC";
+        }
+        PreparedStatement getListingsStatement = sqlController.prepareStatement(statementString);
+        getListingsStatement.setDouble(1, latitude);
+        getListingsStatement.setDouble(2, longitude);
 
-        while (getListingResults.next()) {
-            listings.add(getListingById(getListingResults.getString("ListingID")));
+        // Optional query filters
+        if (queryOptions.getType() == null) {
+            getListingsStatement.setNull(3, Types.VARCHAR);
+            getListingsStatement.setNull(4, Types.VARCHAR);
+        }
+        else {
+            getListingsStatement.setString(3, queryOptions.getType());
+            getListingsStatement.setString(4, queryOptions.getType());
+        }
+        if (queryOptions.getMaxPrice() == null) {
+            getListingsStatement.setNull(5, Types.INTEGER);
+            getListingsStatement.setNull(6, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(5, queryOptions.getMaxPrice());
+            getListingsStatement.setInt(6, queryOptions.getMaxPrice());
+        }
+        if (queryOptions.getMinNumberOfGuests() == null) {
+            getListingsStatement.setNull(7, Types.INTEGER);
+            getListingsStatement.setNull(8, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(7, queryOptions.getMinNumberOfGuests());
+            getListingsStatement.setInt(8, queryOptions.getMinNumberOfGuests());
+        }
+        if (queryOptions.getMinBathrooms() == null) {
+            getListingsStatement.setNull(9, Types.DOUBLE);
+            getListingsStatement.setNull(10, Types.DOUBLE);
+        }
+        else {
+            getListingsStatement.setDouble(9, queryOptions.getMinBathrooms());
+            getListingsStatement.setDouble(10, queryOptions.getMinBathrooms());
+        }
+        if (queryOptions.getMinBedrooms() == null) {
+            getListingsStatement.setNull(11, Types.INTEGER);
+            getListingsStatement.setNull(12, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(11, queryOptions.getMinBedrooms());
+            getListingsStatement.setInt(12, queryOptions.getMinBedrooms());
+        }
+        if (queryOptions.getMinBeds() == null) {
+            getListingsStatement.setNull(13, Types.INTEGER);
+            getListingsStatement.setNull(14, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(13, queryOptions.getMinBeds());
+            getListingsStatement.setInt(14, queryOptions.getMinBeds());
+        }
+        if (queryOptions.getMinKitchens() == null) {
+            getListingsStatement.setNull(15, Types.INTEGER);
+            getListingsStatement.setNull(16, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(15, queryOptions.getMinKitchens());
+            getListingsStatement.setInt(16, queryOptions.getMinKitchens());
+        }
+        if (queryOptions.getMinParkingSpots() == null) {
+            getListingsStatement.setNull(17, Types.INTEGER);
+            getListingsStatement.setNull(18, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(17, queryOptions.getMinParkingSpots());
+            getListingsStatement.setInt(18, queryOptions.getMinParkingSpots());
+        }
+        if (queryOptions.getStartDate() == null) {
+            getListingsStatement.setNull(19, Types.INTEGER);
+            getListingsStatement.setNull(20, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setTimestamp(19, queryOptions.getStartDate());
+            getListingsStatement.setTimestamp(20, queryOptions.getStartDate());
+        }
+        if (queryOptions.getEndDate() == null) {
+            getListingsStatement.setNull(21, Types.INTEGER);
+            getListingsStatement.setNull(22, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setTimestamp(21, queryOptions.getEndDate());
+            getListingsStatement.setTimestamp(22, queryOptions.getEndDate());
         }
 
-        return listings;
+        // Distance is set last because it's in a HAVING clause
+        getListingsStatement.setDouble(23, distance);
+
+        ResultSet getListingResults = getListingsStatement.executeQuery();
+
+        while (getListingResults.next()) {
+            Availability availability = new Availability(
+                    getListingResults.getString("ListingID"),
+                    getListingResults.getTimestamp("StartDate"),
+                    getListingResults.getTimestamp("EndDate"),
+                    getListingResults.getInt("Price")
+            );
+            availabilities.add(availability);
+        }
+
+        return availabilities;
     }
 }

@@ -49,8 +49,9 @@ public class Availability {
   }
 
   public String toString() {
-    return ("[Start: " + getStartDate().toString()
+    return ("ListingID: " + getListingId()
+        + ", Start: " + getStartDate().toString()
         + ", End: " + getEndDate().toString()
-        + ", Price: " + getPrice() + "]");
+        + ", Price: " + getPrice());
   }
 }
