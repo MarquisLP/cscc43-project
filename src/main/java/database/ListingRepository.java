@@ -330,4 +330,35 @@ public class ListingRepository {
             throw new NoSuchElementException();
         }
     }
+
+    public static List<Listing> getListingsWithinDistance(double latitude, double longitude, double distance) throws SQLException {
+        List<Listing> listings = new ArrayList<>();
+
+        SQLController sqlController = SQLController.getInstance();
+        // Latitude-Longitude distance calculation query from Kaletha on StackOverflow:
+        // https://stackoverflow.com/a/5548877
+        String statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "SELECT",
+                "    ListingID",
+                "    , SQRT(",
+                "        POW(69.1 * (Latitude - ?), 2)",
+                "        + POW(69.1 * (? - Longitude) * COS(Latitude / 57.3), 2)) AS Distance",
+                "FROM",
+                "   Listing",
+                "HAVING",
+                "   Distance * 1.609344 < ?",
+                ";");
+        PreparedStatement deleteListingStatement = sqlController.prepareStatement(statementString);
+        deleteListingStatement.setDouble(1, latitude);
+        deleteListingStatement.setDouble(2, longitude);
+        deleteListingStatement.setDouble(3, distance);
+        ResultSet getListingResults = deleteListingStatement.executeQuery();
+
+        while (getListingResults.next()) {
+            listings.add(getListingById(getListingResults.getString("ListingID")));
+        }
+
+        return listings;
+    }
 }
