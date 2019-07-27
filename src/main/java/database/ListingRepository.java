@@ -231,7 +231,7 @@ public class ListingRepository {
         ResultSet availabilityResults = getAvailabilitiesStatement.executeQuery();
         while (availabilityResults.next()) {
             Availability availability = new Availability(
-                    availabilityResults.getString("ListingID"),
+                    listingId,
                     availabilityResults.getTimestamp("StartDate"),
                     availabilityResults.getTimestamp("EndDate"),
                     availabilityResults.getInt("Price")
