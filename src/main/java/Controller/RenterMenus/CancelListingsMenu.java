@@ -1,8 +1,13 @@
 package Controller.RenterMenus;
 
+import database.BookingRepository;
 import database.SQLController;
 import database.models.Booking;
 import database.models.Renter;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class CancelListingsMenu {
@@ -16,8 +21,12 @@ public class CancelListingsMenu {
     // 'sc' is needed in order to scan the inputs provided by the user
     Scanner sc = null;
 
-    if (sc == null) { sc = new Scanner(System.in); }
-    if (sqlMngr == null) { sqlMngr = SQLController.getInstance(); }
+    if (sc == null) {
+      sc = new Scanner(System.in);
+    }
+    if (sqlMngr == null) {
+      sqlMngr = SQLController.getInstance();
+    }
 
     boolean quit = false;
     System.out.println("");
@@ -46,11 +55,11 @@ public class CancelListingsMenu {
 
       switch (choice) {
         case 0:
-          System.out.println("Goodbye!");
           quit = true;
           break;
         case 1:
           // 1: See all your bookings
+          seeBookings(renter);
           break;
         case 2:
           // 2: Cancel a booking
@@ -58,6 +67,7 @@ public class CancelListingsMenu {
         case 3:
           // 3: See cancelled bookings
           break;
+        default:
           System.out.println("Invalid option\n");
           break;
       }
@@ -67,9 +77,20 @@ public class CancelListingsMenu {
 
   }
 
-
   private static void seeBookings(Renter renter) {
+    try {
+      List<Booking> bookingList = new ArrayList<>();
+      bookingList = BookingRepository.getBookingByUser(renter);
 
+      for (Booking booking : bookingList) {
+        System.out.println("");
+        System.out.println(booking.toString());
+      }
+    } catch (SQLException exception) {
+      System.out.println(exception);
+    } catch (NoSuchElementException exception) {
+      System.out.println(exception);
+    }
   }
 
 }
