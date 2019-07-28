@@ -16,17 +16,20 @@ public class ManageListingsMenu {
         do {
             System.out.println();
             System.out.println("============= MANAGE LISTINGS ================");
+            System.out.println("0. Return to Host Main Menu");
             System.out.println("1. View my listings");
             System.out.println("2. Cancel a booking");
             System.out.println("3. Add availability to a listing");
             System.out.println("4. Update price for a listing's availability");
             System.out.println("5. Update date range for a listing's availability");
             System.out.println("6. Delete a listing");
-            System.out.println("7. Exit");
             System.out.print("Enter the number of one of the options above: ");
 
             input = sc.nextLine();
             switch (input) {
+                case "0":
+                    continueRunning = false;
+                    break;
                 case "1":
                     ViewHostListingsMenu.viewHostListings(host);
                     break;
@@ -41,9 +44,6 @@ public class ManageListingsMenu {
                 case "5":
                     break;
                 case "6":
-                    break;
-                case "7":
-                    continueRunning = false;
                     break;
                 default:
                     System.out.println("Invalid option.");

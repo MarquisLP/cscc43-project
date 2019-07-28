@@ -13,17 +13,20 @@ public class HostMenu {
         do {
             System.out.println();
             System.out.println("========HOST MENU=========");
+            System.out.println("0. Exit");
             System.out.println("1. Create a new listing");
             System.out.println("2. Manage my listings");
             System.out.println("3. Review a renter");
             System.out.println("4. Go to account menu");
             System.out.println("5. View reports");
-            System.out.println("6. Exit");
 
             System.out.print("Enter the number of one of the options above: ");
             input = sc.nextLine();
 
             switch (input) {
+                case "0":
+                    continueRunning = false;
+                    break;
                 case "1":
                     CreateListingMenu.createListing(host);
                     break;
@@ -35,9 +38,6 @@ public class HostMenu {
                 case "4":
                     break;
                 case "5":
-                    break;
-                case "6":
-                    continueRunning = false;
                     break;
                 default:
                     System.out.println("Invalid option.");
