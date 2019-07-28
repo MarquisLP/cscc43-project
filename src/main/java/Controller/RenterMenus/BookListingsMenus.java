@@ -1,15 +1,14 @@
 package Controller.RenterMenus;
 
+import database.BookingRepository;
 import database.ListingRepository;
 import database.ListingRepository.ListingQueryOptions;
 import database.ListingRepository.SortField;
-import database.ListingRepository.SortOrder;
 import database.SQLController;
 import database.models.Address;
 import database.models.Availability;
 import database.models.Renter;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.TimeZone;
 
 
 public class BookListingsMenus {
@@ -96,10 +94,12 @@ public class BookListingsMenus {
           break;
         case 5:
           // 5: Clear filters
+          //Note this may not work i just made it a new object.
+          clearAllFilters();
           break;
         case 6:
           // 6: Book listing
-          bookListing();
+          bookListing(renter);
           break;
         default:
           System.out.println("Invalid option\n");
@@ -110,7 +110,40 @@ public class BookListingsMenus {
     } while (!quit);
   }
 
-  private static void bookListing() {
+  private static void bookListing(Renter renter) {
+    String listingId = "";
+    String startTime = null;
+    String endTime = null;
+    String input = "";
+    SQLController sqlMngr = null;
+    Scanner sc = null;
+    boolean breakloop = false;
+
+    if (sc == null) {
+      sc = new Scanner(System.in);
+    }
+    if (sqlMngr == null) {
+      sqlMngr = SQLController.getInstance();
+    }
+
+    System.out.println("Enter the ListingID of the unit, be exact");
+    listingId = sc.nextLine();
+
+    System.out.println("Enter the Start date of the unit, be exact YYYY-MM-DD");
+    startTime = sc.nextLine();
+
+    System.out.println("Enter the End date of the unit, be exact YYYY-MM-DD");
+    endTime = sc.nextLine();
+
+    try {
+      BookingRepository.booking(listingId, startTime, endTime, renter);
+      System.out.println("Listing booked! ID: " + listingId + " from " +
+          startTime + " to " + endTime);
+    } catch (SQLException exception) {
+      System.out.println("SQL exception");
+    } catch (NoSuchElementException exception) {
+      System.out.println("No element exception");
+    }
 
   }
 
@@ -288,8 +321,12 @@ public class BookListingsMenus {
     Scanner sc = null;
     Address address = new Address();
 
-    if (sc == null) { sc = new Scanner(System.in); }
-    if (sqlMngr == null) { sqlMngr = SQLController.getInstance(); }
+    if (sc == null) {
+      sc = new Scanner(System.in);
+    }
+    if (sqlMngr == null) {
+      sqlMngr = SQLController.getInstance();
+    }
 
     System.out.println("Would you like to search by specific date range?(y/n)");
     System.out.println("Note: This will override any previous filters set");
@@ -608,7 +645,6 @@ public class BookListingsMenus {
       if (!(input.equals(""))) {
         try {
           DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-          df.setTimeZone(TimeZone.getTimeZone("UTC"));
           dateChoice = new Timestamp((df.parse(input)).getTime());
           // Sets enddate
           options.setEndDate(dateChoice);
@@ -622,6 +658,11 @@ public class BookListingsMenus {
         breakloop = true;
       }
     } while (breakloop == false);
+  }
+
+
+  private static void clearAllFilters() {
+    options = new ListingQueryOptions();
   }
 
 
