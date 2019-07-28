@@ -241,7 +241,12 @@ public class ListingRepository {
         }
     }
 
+    // Hides booked availablities by default
     public static Listing getListingById(String listingId) throws SQLException {
+        return getListingById(listingId, true);
+    }
+
+    public static Listing getListingById(String listingId, boolean hideBookedAvailabilities) throws SQLException {
         SQLController sqlController = SQLController.getInstance();
 
         /*
@@ -250,67 +255,30 @@ public class ListingRepository {
         String statementString = String.join(System.getProperty("line.separator"),
                 "",
                 "SELECT",
-                "    PostalCode",
-                "    , Country",
+                "   l.ListingID",
+                "   , l.type",
+                "   , l.Latitude",
+                "   , l.Longitude",
+                "   , ad.PostalCode",
+                "   , ad.City",
+                "   , ad.Country",
+                "   , am.NumberOfGuests",
+                "   , am.Bathrooms",
+                "   , am.Bedrooms",
+                "   , am.Beds",
+                "   , am.Kitchen",
+                "   , am.ParkingSpots",
                 "FROM",
-                "    LocatedAt",
+                "   Listing AS l",
+                "   INNER JOIN LocatedAt AS la ON la.ListingID = l.ListingID",
+                "   INNER JOIN Address AS ad ON (ad.PostalCode = la.PostalCode AND ad.Country = la.Country)",
+                "   INNER JOIN Amenities AS am ON am.ListingID = l.ListingID",
                 "WHERE",
-                "    ListingID = ?",
+                "   l.ListingID = ?",
                 ";");
-        PreparedStatement getLocatedAtStatement = sqlController.prepareStatement(statementString);
-        getLocatedAtStatement.setString(1, listingId);
-        ResultSet locatedAtResults = getLocatedAtStatement.executeQuery();
-        locatedAtResults.first();
-        statementString = String.join(System.getProperty("line.separator"),
-                "",
-                "SELECT",
-                "    City",
-                "FROM",
-                "    Address",
-                "WHERE",
-                "    PostalCode = ?",
-                "    AND Country = ?",
-                ";");
-        PreparedStatement getAddressStatement = sqlController.prepareStatement(statementString);
-        getAddressStatement.setString(1, locatedAtResults.getString("PostalCode"));
-        getAddressStatement.setString(2, locatedAtResults.getString("Country"));
-        ResultSet addressResults = getAddressStatement.executeQuery();
-        addressResults.first();
-        Address address = new Address(
-                locatedAtResults.getString("PostalCode"),
-                addressResults.getString("City"),
-                locatedAtResults.getString("Country")
-        );
-
-        /*
-         * Get the listing's amenities.
-         */
-        statementString = String.join(System.getProperty("line.separator"),
-                "",
-                "SELECT",
-                "    NumberOfGuests",
-                "    , Bathrooms",
-                "    , Bedrooms",
-                "    , Beds",
-                "    , Kitchen",
-                "    , Parkingspots",
-                "FROM",
-                "    Amenities",
-                "WHERE",
-                "    ListingID = ?",
-                ";");
-        PreparedStatement getAmenitiesStatement = sqlController.prepareStatement(statementString);
-        getAmenitiesStatement.setString(1, listingId);
-        ResultSet amenitiesResult = getAmenitiesStatement.executeQuery();
-        amenitiesResult.first();
-        Amenities amenities = new Amenities(
-                amenitiesResult.getInt("NumberOfGuests"),
-                amenitiesResult.getDouble("Bathrooms"),
-                amenitiesResult.getInt("Bedrooms"),
-                amenitiesResult.getInt("Beds"),
-                amenitiesResult.getInt("Kitchen"),
-                amenitiesResult.getInt("ParkingSpots")
-        );
+        PreparedStatement getListingsStatement = sqlController.prepareStatement(statementString);
+        getListingsStatement.setString(1, listingId);
+        ResultSet getListingsResults = getListingsStatement.executeQuery();
 
         /*
          * Get the listing's availabilities.
@@ -325,21 +293,30 @@ public class ListingRepository {
                 "FROM",
                 "    Availability",
                 "WHERE",
-                "    ListingID = ?",
-                "    AND NOT EXISTS (",
-                "       SELECT",
-                "           *",
-                "       FROM",
-                "           Booking",
-                "       WHERE",
-                "           Booking.ListingID = ?",
-                "           AND Booking.StartDate = Availability.StartDate",
-                "           AND Booking.EndDate = Availability.EndDate",
-                "    )",
-                ";");
+                "    ListingID = ?"
+                );
+        if (hideBookedAvailabilities) {
+            statementString += String.join(System.getProperty("line.separator"),
+                "",
+                    "AND NOT EXISTS (",
+                    "   SELECT",
+                    "       *",
+                    "   FROM",
+                    "       Booking",
+                    "   WHERE",
+                    "       Booking.ListingID = ?",
+                    "       AND Booking.Cancelled = 0",
+                    "       AND Booking.StartDate = Availability.StartDate",
+                    "       AND Booking.EndDate = Availability.EndDate",
+                    ")"
+                );
+        }
+        statementString += "\n;";
         PreparedStatement getAvailabilitiesStatement = sqlController.prepareStatement(statementString);
         getAvailabilitiesStatement.setString(1, listingId);
-        getAvailabilitiesStatement.setString(2, listingId);
+        if (hideBookedAvailabilities) {
+            getAvailabilitiesStatement.setString(2, listingId);
+        }
         ResultSet availabilityResults = getAvailabilitiesStatement.executeQuery();
         while (availabilityResults.next()) {
             Availability availability = new Availability(
@@ -351,30 +328,25 @@ public class ListingRepository {
             availabilities.add(availability);
         }
 
-        /*
-         * Get the listing's general info.
-         */
-        statementString = String.join(System.getProperty("line.separator"),
-                "",
-                "SELECT",
-                "    Type",
-                "    , Longitude",
-                "    , Latitude",
-                "FROM",
-                "    Listing",
-                "WHERE",
-                "    ListingID = ?",
-                ";");
-        PreparedStatement getListingStatement = sqlController.prepareStatement(statementString);
-        getListingStatement.setString(1, listingId);
-        ResultSet listingResult = getListingStatement.executeQuery();
-        listingResult.first();
-
+        getListingsResults.first();
+        Address address = new Address(
+                getListingsResults.getString("PostalCode"),
+                getListingsResults.getString("City"),
+                getListingsResults.getString("Country")
+        );
+        Amenities amenities = new Amenities(
+                getListingsResults.getInt("NumberOfGuests"),
+                getListingsResults.getDouble("Bathrooms"),
+                getListingsResults.getInt("Bedrooms"),
+                getListingsResults.getInt("Beds"),
+                getListingsResults.getInt("Kitchen"),
+                getListingsResults.getInt("ParkingSpots")
+        );
         return new Listing(
                 listingId,
-                listingResult.getString("Type"),
-                listingResult.getDouble("Latitude"),
-                listingResult.getDouble("Longitude"),
+                getListingsResults.getString("Type"),
+                getListingsResults.getDouble("Latitude"),
+                getListingsResults.getDouble("Longitude"),
                 address,
                 amenities,
                 availabilities
@@ -400,7 +372,38 @@ public class ListingRepository {
 
         while (hostedByResults.next()) {
             String listingId = hostedByResults.getString("ListingID");
-            listings.add(getListingById(listingId));
+            Listing listing = getListingById(listingId, false);
+
+            // Get bookings for that listing
+            statementString = String.join(System.getProperty("line.separator"),
+                    "",
+                    "SELECT",
+                    "    StartDate",
+                    "   , EndDate",
+                    "   , SIN",
+                    "   , Cancelled",
+                    "FROM",
+                    "    Booking",
+                    "WHERE",
+                    "    ListingID = ?",
+                    ";");
+            PreparedStatement getBookingsStatement = sqlController.prepareStatement(statementString);
+            getBookingsStatement.setString(1, listingId);
+            ResultSet getBookingsResults = getBookingsStatement.executeQuery();
+            List<Booking> bookings = new ArrayList<>();
+            while (getBookingsResults.next()) {
+                Booking booking = new Booking(
+                        listingId,
+                        getBookingsResults.getTimestamp("StartDate"),
+                        getBookingsResults.getTimestamp("EndDate"),
+                        getBookingsResults.getString("SIN"),
+                        getBookingsResults.getBoolean("Cancelled")
+                );
+                bookings.add(booking);
+            }
+            listing.setBookings(bookings);
+
+            listings.add(listing);
         }
 
         return listings;
@@ -465,7 +468,8 @@ public class ListingRepository {
                 "   INNER JOIN Availability AS av ON av.ListingID = l.ListingID",
                 "   INNER JOIN Amenities AS am ON am.ListingID = l.ListingID",
                 "WHERE",
-                "   NOT EXISTS (",
+                "   av.StartDate < CURRENT_TIMESTAMP",
+                "   AND NOT EXISTS (",
                 "       SELECT",
                 "           *",
                 "       FROM",
@@ -625,7 +629,8 @@ public class ListingRepository {
                 "   INNER JOIN Availability AS av ON av.ListingID = l.ListingID",
                 "   INNER JOIN Amenities AS am ON am.ListingID = l.ListingID",
                 "WHERE",
-                "   NOT EXISTS (",
+                "   av.StartDate < CURRENT_TIMESTAMP",
+                "   AND NOT EXISTS (",
                 "       SELECT",
                 "           *",
                 "       FROM",
@@ -778,7 +783,8 @@ public class ListingRepository {
                 "   INNER JOIN Availability AS av ON av.ListingID = l.ListingID",
                 "   INNER JOIN Amenities AS am ON am.ListingID = l.ListingID",
                 "WHERE",
-                "   NOT EXISTS (",
+                "   av.StartDate < CURRENT_TIMESTAMP",
+                "   AND NOT EXISTS (",
                 "       SELECT",
                 "           *",
                 "       FROM",

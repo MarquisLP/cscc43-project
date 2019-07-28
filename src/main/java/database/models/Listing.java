@@ -13,6 +13,7 @@ public class Listing {
     private Address address;
     private Amenities amenities;
     private List<Availability> availabilities;
+    private List<Booking> bookings;
 
     public Listing(String listingId, String type, double latitude, double longitude, Address address, Amenities amenities, List<Availability> availabilities) {
         this.listingId = listingId;
@@ -111,6 +112,14 @@ public class Listing {
         this.availabilities = availabilities;
     }
 
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
+
     @Override
     public String toString() {
         StringBuilder returnString = new StringBuilder()
@@ -131,12 +140,12 @@ public class Listing {
                 .append(getAmenities().toString())
                 .append("\n");
 
+        int availibilityIndex = 0;
         if (getAvailabilities().size() == 0) {
             returnString.append("NO AVAILABLE TIMESLOTS");
         }
         else {
             returnString.append("AVAILABLE TIMESLOTS:\n");
-            int availibilityIndex = 0;
             for (Availability availability : getAvailabilities()) {
                 returnString.append("[ Start: ");
                 returnString.append(availability.getStartDate());
@@ -152,6 +161,37 @@ public class Listing {
                 }
                 else {
                     returnString.append(" ");
+                }
+            }
+        }
+        if (getBookings() != null) {
+            if ((getAvailabilities().size() == 0) || (availibilityIndex % 3 != 0)) {
+                returnString.append("\n");
+            }
+            if (getBookings().size() == 0) {
+                returnString.append("NO BOOKINGS");
+            }
+            else {
+                returnString.append("BOOKINGS:\n");
+                int bookingIndex = 0;
+                for (Booking booking : getBookings()) {
+                    returnString.append("[ Start: ");
+                    returnString.append(booking.getStartDate());
+                    returnString.append(", End: ");
+                    returnString.append(booking.getEndDate());
+                    returnString.append(", Booked User SIN: ");
+                    returnString.append(booking.getSin());
+                    returnString.append(", Cancelled: ");
+                    returnString.append(booking.isCancelled());
+                    returnString.append(" ]");
+
+                    bookingIndex++;
+                    if (bookingIndex % 3 == 0) {
+                        returnString.append("\n");
+                    }
+                    else {
+                        returnString.append("  ");
+                    }
                 }
             }
         }
