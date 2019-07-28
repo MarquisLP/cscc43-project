@@ -241,7 +241,12 @@ public class ListingRepository {
         }
     }
 
+    // Hides booked availablities by default
     public static Listing getListingById(String listingId) throws SQLException {
+        return getListingById(listingId, true);
+    }
+
+    public static Listing getListingById(String listingId, boolean hideBookedAvailabilities) throws SQLException {
         SQLController sqlController = SQLController.getInstance();
 
         /*
@@ -288,21 +293,30 @@ public class ListingRepository {
                 "FROM",
                 "    Availability",
                 "WHERE",
-                "    ListingID = ?",
-                "    AND NOT EXISTS (",
-                "       SELECT",
-                "           *",
-                "       FROM",
-                "           Booking",
-                "       WHERE",
-                "           Booking.ListingID = ?",
-                "           AND Booking.StartDate = Availability.StartDate",
-                "           AND Booking.EndDate = Availability.EndDate",
-                "    )",
-                ";");
+                "    ListingID = ?"
+                );
+        if (hideBookedAvailabilities) {
+            statementString += String.join(System.getProperty("line.separator"),
+                "",
+                    "AND NOT EXISTS (",
+                    "   SELECT",
+                    "       *",
+                    "   FROM",
+                    "       Booking",
+                    "   WHERE",
+                    "       Booking.ListingID = ?",
+                    "       AND Booking.Cancelled = 0",
+                    "       AND Booking.StartDate = Availability.StartDate",
+                    "       AND Booking.EndDate = Availability.EndDate",
+                    ")"
+                );
+        }
+        statementString += "\n;";
         PreparedStatement getAvailabilitiesStatement = sqlController.prepareStatement(statementString);
         getAvailabilitiesStatement.setString(1, listingId);
-        getAvailabilitiesStatement.setString(2, listingId);
+        if (hideBookedAvailabilities) {
+            getAvailabilitiesStatement.setString(2, listingId);
+        }
         ResultSet availabilityResults = getAvailabilitiesStatement.executeQuery();
         while (availabilityResults.next()) {
             Availability availability = new Availability(
@@ -358,7 +372,7 @@ public class ListingRepository {
 
         while (hostedByResults.next()) {
             String listingId = hostedByResults.getString("ListingID");
-            Listing listing = getListingById(listingId);
+            Listing listing = getListingById(listingId, false);
 
             // Get bookings for that listing
             statementString = String.join(System.getProperty("line.separator"),
