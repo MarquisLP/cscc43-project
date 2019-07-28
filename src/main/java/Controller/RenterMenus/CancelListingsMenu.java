@@ -63,9 +63,11 @@ public class CancelListingsMenu {
           break;
         case 2:
           // 2: Cancel a booking
+          cancelBooking(renter);
           break;
         case 3:
           // 3: See cancelled bookings
+          seeCancelledBookings(renter);
           break;
         default:
           System.out.println("Invalid option\n");
@@ -80,8 +82,67 @@ public class CancelListingsMenu {
   private static void seeBookings(Renter renter) {
     try {
       List<Booking> bookingList = new ArrayList<>();
-      bookingList = BookingRepository.getBookingByUser(renter);
+      bookingList = BookingRepository.getBookingsByUser(renter);
 
+      if (bookingList.size() == 0) {
+        System.out.println("You don't have anything booked!");
+      }
+      for (Booking booking : bookingList) {
+        System.out.println("");
+        System.out.println(booking.toString());
+      }
+    } catch (SQLException exception) {
+      System.out.println(exception);
+    } catch (NoSuchElementException exception) {
+      System.out.println(exception);
+    }
+  }
+
+  private static void cancelBooking(Renter renter) {
+    String listingId = "";
+    String startTime = null;
+    String endTime = null;
+    String input = "";
+    SQLController sqlMngr = null;
+    Scanner sc = null;
+    boolean breakloop = false;
+
+    if (sc == null) {
+      sc = new Scanner(System.in);
+    }
+    if (sqlMngr == null) {
+      sqlMngr = SQLController.getInstance();
+    }
+
+    System.out.println("Enter the ListingID of the unit, be exact");
+    listingId = sc.nextLine();
+
+    System.out.println("Enter the Start date of the unit, be exact YYYY-MM-DD");
+    startTime = sc.nextLine();
+
+    System.out.println("Enter the End date of the unit, be exact YYYY-MM-DD");
+    endTime = sc.nextLine();
+
+    try {
+      BookingRepository.cancelBooking(listingId, startTime, endTime, renter);
+      System.out.println("Listing cancelled! ID: " + listingId + " from " +
+          startTime + " to " + endTime);
+    } catch (SQLException exception) {
+      System.out.println("SQL exception");
+    } catch (NoSuchElementException exception) {
+      System.out.println("No element exception");
+    }
+  }
+
+
+  private static void seeCancelledBookings(Renter renter) {
+    try {
+      List<Booking> bookingList = new ArrayList<>();
+      bookingList = BookingRepository.getCancelledBookingsByUser(renter);
+
+      if (bookingList.size() == 0) {
+        System.out.println("You haven't cancelled anything yet");
+      }
       for (Booking booking : bookingList) {
         System.out.println("");
         System.out.println(booking.toString());
