@@ -1,6 +1,8 @@
 package database.models;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 public class Availability {
 
@@ -49,9 +51,11 @@ public class Availability {
   }
 
   public String toString() {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     return ("ListingID: " + getListingId()
-        + ", Start: " + getStartDate().toString()
-        + ", End: " + getEndDate().toString()
+        + ", Start: " + dateFormat.format(getStartDate())
+        + ", End: " + dateFormat.format(getEndDate())
         + ", Price: " + getPrice());
   }
 }

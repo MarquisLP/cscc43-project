@@ -4,6 +4,7 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Random;
+import java.util.TimeZone;
 
 public class Listing {
     private String listingId;
@@ -145,12 +146,14 @@ public class Listing {
             returnString.append("NO AVAILABLE TIMESLOTS");
         }
         else {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
             returnString.append("AVAILABLE TIMESLOTS:\n");
             for (Availability availability : getAvailabilities()) {
                 returnString.append("[ Start: ");
-                returnString.append(availability.getStartDate());
+                returnString.append(dateFormat.format(availability.getStartDate()));
                 returnString.append(",  End: ");
-                returnString.append(availability.getEndDate());
+                returnString.append(dateFormat.format(availability.getEndDate()));
                 returnString.append(", Price: ");
                 returnString.append(availability.getPrice());
                 returnString.append(" ]");
@@ -174,11 +177,13 @@ public class Listing {
             else {
                 returnString.append("BOOKINGS:\n");
                 int bookingIndex = 0;
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                 for (Booking booking : getBookings()) {
                     returnString.append("[ Start: ");
-                    returnString.append(booking.getStartDate());
+                    returnString.append(dateFormat.format(booking.getStartDate()));
                     returnString.append(", End: ");
-                    returnString.append(booking.getEndDate());
+                    returnString.append(dateFormat.format(booking.getEndDate()));
                     returnString.append(", Booked User SIN: ");
                     returnString.append(booking.getSin());
                     returnString.append(", Cancelled: ");
