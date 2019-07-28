@@ -28,6 +28,7 @@ public class ManageListingsMenu {
             input = sc.nextLine();
             switch (input) {
                 case "1":
+                    ViewHostListingsMenu.viewHostListings(host);
                     break;
                 case "2":
                     break;
