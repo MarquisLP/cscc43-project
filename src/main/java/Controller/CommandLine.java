@@ -122,9 +122,11 @@ public class CommandLine {
       }
 
       if (user instanceof Host) {
-        return hostMenu();
+        HostMenu.hostMenu((Host) user);
+        return true;
       } else {
-        return renterMenu();
+        RenterMenu.renterMenu((Renter) user);
+        return true;
       }
     } else {
       System.out.println("");
