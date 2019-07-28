@@ -1,7 +1,8 @@
 
 package Controller;
 
-import database.AvailabilityRepository;
+import Controller.HostMenus.HostMenu;
+import Controller.RenterMenus.RenterMenu;
 import database.BookingRepository;
 import database.HostRepository;
 import database.ReviewRepository;
