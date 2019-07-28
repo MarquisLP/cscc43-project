@@ -1,6 +1,7 @@
 package database;
 
 import database.models.Booking;
+import database.models.Host;
 import database.models.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,7 +17,7 @@ public class BookingRepository {
 
   /**
    *
-   * @param listingId
+   * @param listingID
    * @param startDate
    * @param endDate
    * @throws NoSuchElementException
@@ -178,10 +179,75 @@ public class BookingRepository {
         "    Booking.ListingID = ?",
         "    AND Booking.StartDate = ?",
         "    AND Booking.EndDate = ?",
-        "    AND Booking.SIN = ?",
         ";");
     PreparedStatement updateBookingStatement = sqlController
         .prepareStatement(statementString);
+    updateBookingStatement.setBoolean(1, true);
+    updateBookingStatement.setString(2, booking.getListingID());
+    updateBookingStatement.setTimestamp(3, booking.getStartDate());
+    updateBookingStatement.setTimestamp(4, booking.getEndDate());
+    updateBookingStatement.setString(5, booking.getSin());
+    updateBookingStatement.executeUpdate();
+  }
+
+
+  public static void cancelBookingAsHost(String listingID, String startDate, String
+          endDate, Host host) throws NoSuchElementException, IllegalArgumentException, SQLException {
+
+    SQLController sqlController = SQLController.getInstance();
+
+    String statementString = String.join(System.getProperty("line.separator"),
+            "",
+            "SELECT",
+            "    b.ListingID AS ListingID, StartDate, EndDate, b.SIN AS RenterSIN, Cancelled, h.SIN AS HostSIN",
+            "FROM",
+            "    Booking AS b",
+            "    INNER JOIN HostedBy AS h ON b.ListingID = h.ListingID",
+            "WHERE",
+            "    b.ListingID = ?",
+            "    AND b.StartDate = ?",
+            "    AND b.EndDate = ?",
+            ";");
+    PreparedStatement getBookingStatement = sqlController
+            .prepareStatement(statementString);
+    getBookingStatement.setString(1, listingID);
+    getBookingStatement.setString(2, startDate);
+    getBookingStatement.setString(3, endDate);
+    ResultSet resultSet = getBookingStatement.executeQuery();
+    if (!resultSet.next()) {
+        throw new NoSuchElementException();
+    }
+    if (!(resultSet.getString("HostSIN").equals(host.getSin()))) {
+      throw new IllegalArgumentException();
+    }
+
+    Booking booking = new Booking();
+    resultSet.first();
+    booking.setListingID(resultSet.getString("ListingID"));
+    Timestamp starttime = (resultSet.getTimestamp("StartDate"));
+    booking.setStartDate(starttime);
+    Timestamp endtime = (resultSet.getTimestamp("EndDate"));
+    booking.setEndDate(endtime);
+    booking.setSin(resultSet.getString("RenterSIN"));
+    booking.setCancelled(resultSet.getBoolean("Cancelled"));
+
+        /*
+          UPDATES the table to indicate the booking was cancelled.
+         */
+    statementString = String.join(System.getProperty("line.separator"),
+            "",
+            "UPDATE",
+            "    Booking",
+            "SET",
+            "    Cancelled = ?",
+            "WHERE",
+            "    Booking.ListingID = ?",
+            "    AND Booking.StartDate = ?",
+            "    AND Booking.EndDate = ?",
+            "    AND Booking.SIN = ?",
+            ";");
+    PreparedStatement updateBookingStatement = sqlController
+            .prepareStatement(statementString);
     updateBookingStatement.setBoolean(1, true);
     updateBookingStatement.setString(2, booking.getListingID());
     updateBookingStatement.setTimestamp(3, booking.getStartDate());

@@ -2,6 +2,7 @@ package database;
 
 import database.models.*;
 
+import java.rmi.AccessException;
 import java.sql.*;
 import java.util.*;
 
@@ -416,17 +417,23 @@ public class ListingRepository {
      * @throws NoSuchElementException if no Listing with the given listingID exists
      * @throws IllegalArgumentException if the given Listing currently has future, uncancelled bookings
      */
-    public static void deleteListing(String listingId) throws SQLException, NoSuchElementException, IllegalArgumentException {
+    public static void deleteListing(String listingId, Host host)
+            throws SQLException, NoSuchElementException, IllegalArgumentException {
         SQLController sqlController = SQLController.getInstance();
         String statementString = String.join(System.getProperty("line.separator"),
                 "",
-                "DELETE FROM",
-                "    Listing",
+                "DELETE",
+                "    l",
+                "FROM",
+                "    Listing AS l",
+                "    INNER JOIN HostedBy AS h ON h.ListingID = l.ListingID",
                 "WHERE",
-                "    ListingID = ?",
+                "    l.ListingID = ?",
+                "    AND h.SIN = ?",
                 ";");
         PreparedStatement deleteListingStatement = sqlController.prepareStatement(statementString);
         deleteListingStatement.setString(1, listingId);
+        deleteListingStatement.setString(2, host.getSin());
 
         int numRowsDeleted = 0;
         try {
