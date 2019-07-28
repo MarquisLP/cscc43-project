@@ -3,6 +3,8 @@ package database.models;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 public class Booking {
 
@@ -66,9 +68,11 @@ public class Booking {
   }
 
   public String toString() {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
     return ("Listing ID: " + getListingID()
-        + "\nStart Date: " + getStartDate()
-        + "\nEnd Date: " + getEndDate()
+        + "\nStart Date: " + dateFormat.format(getStartDate())
+        + "\nEnd Date: " + dateFormat.format(getEndDate())
         + "\nBooked User SIN: " + getSin()
         + "\nCancelled: " + isCancelled());
   }
