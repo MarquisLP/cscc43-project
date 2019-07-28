@@ -1,10 +1,16 @@
 package database;
 
+import database.models.Listing;
+import database.models.ListingReview;
 import database.models.Renter;
 import database.models.User;
+import database.models.UserReview;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReviewRepository {
   /*
@@ -146,6 +152,240 @@ public class ReviewRepository {
   }
 
 
+  /**
+   *
+   * @param listingID
+   * @return
+   * @throws SQLException
+   * @throws IllegalAccessException
+   */
+  public static List<ListingReview> getAllLsitingReviewsByListingId(String
+      listingID) throws SQLException, IllegalAccessException {
 
+    //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
+    SQLController sqlController = SQLController.getInstance();
+    List<ListingReview> listingReviews = new ArrayList<>();
+
+    String statementString = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT",
+        "    ListingID, SIN, Comment, Rating",
+        "FROM",
+        "    ListingReview",
+        "WHERE",
+        "    ListingReview.ListingID = ?",
+        ";");
+    PreparedStatement getBookingStatement = sqlController
+        .prepareStatement(statementString);
+    getBookingStatement.setString(1, listingID);
+    ResultSet resultSet = getBookingStatement.executeQuery();
+
+    while (resultSet.next()) {
+      ListingReview review = new ListingReview();
+      review.setListingID(listingID);
+      review.setRenterSin(resultSet.getString("SIN"));
+      review.setComment(resultSet.getString("Comment"));
+      review.setRating(resultSet.getInt("Rating"));
+
+      listingReviews.add(review);
+    }
+
+    return listingReviews;
+  }
+
+  public static List<ListingReview> getAllListingReviewsByRenterSin(String
+      renterSin) throws SQLException, IllegalAccessException {
+
+    //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
+    SQLController sqlController = SQLController.getInstance();
+    List<ListingReview> listingReviews = new ArrayList<>();
+
+    String statementString = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT",
+        "    ListingID, SIN, Comment, Rating",
+        "FROM",
+        "    ListingReview",
+        "WHERE",
+        "    ListingReview.SIN = ?",
+        ";");
+    PreparedStatement getBookingStatement = sqlController
+        .prepareStatement(statementString);
+    getBookingStatement.setString(1, renterSin);
+    ResultSet resultSet = getBookingStatement.executeQuery();
+
+    while (resultSet.next()) {
+      ListingReview review = new ListingReview();
+      review.setListingID(resultSet.getString("ListingID"));
+      review.setRenterSin(renterSin);
+      review.setComment(resultSet.getString("Comment"));
+      review.setRating(resultSet.getInt("Rating"));
+
+      listingReviews.add(review);
+    }
+
+    return listingReviews;
+  }
+
+
+  /**
+   *
+   * @param hostsin
+   * @return
+   * @throws SQLException
+   * @throws IllegalAccessException
+   */
+  public static List<UserReview> getAllHostReviewsByHostSin(String hostsin)
+      throws SQLException, IllegalAccessException {
+
+    //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
+    SQLController sqlController = SQLController.getInstance();
+    List<UserReview> userReviews = new ArrayList<>();
+
+    String statementString = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT",
+        "    HostSIN, RenterSIN, Comment, Rating",
+        "FROM",
+        "    HostReview",
+        "WHERE",
+        "    HostReview.HostSIN = ?",
+        ";");
+    PreparedStatement getBookingStatement = sqlController
+        .prepareStatement(statementString);
+    getBookingStatement.setString(1, hostsin);
+    ResultSet resultSet = getBookingStatement.executeQuery();
+
+    while (resultSet.next()) {
+      UserReview review = new UserReview();
+      review.setHostSin(hostsin);
+      review.setRenterSin(resultSet.getString("RenterSIN"));
+      review.setComment(resultSet.getString("Comment"));
+      review.setRating(resultSet.getInt("Rating"));
+
+      userReviews.add(review);
+    }
+
+    return userReviews;
+  }
+
+
+  public static List<UserReview> getAllHostReviewsByRenterSin(String renterSin)
+      throws SQLException, IllegalAccessException {
+
+    //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
+    SQLController sqlController = SQLController.getInstance();
+    List<UserReview> userReviews = new ArrayList<>();
+
+    String statementString = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT",
+        "    HostSIN, RenterSIN, Comment, Rating",
+        "FROM",
+        "    HostReview",
+        "WHERE",
+        "    HostReview.RenterSIN = ?",
+        ";");
+    PreparedStatement getBookingStatement = sqlController
+        .prepareStatement(statementString);
+    getBookingStatement.setString(1, renterSin);
+    ResultSet resultSet = getBookingStatement.executeQuery();
+
+    while (resultSet.next()) {
+      UserReview review = new UserReview();
+      review.setHostSin(resultSet.getString("HostSIN"));
+      review.setRenterSin(renterSin);
+      review.setComment(resultSet.getString("Comment"));
+      review.setRating(resultSet.getInt("Rating"));
+
+      userReviews.add(review);
+    }
+
+    return userReviews;
+  }
+
+
+  /**
+   *
+   * @param renterSin
+   * @return
+   * @throws SQLException
+   * @throws IllegalAccessException
+   */
+  public static List<UserReview> getAllRenterReviewsByRenterSin(String
+      renterSin) throws SQLException, IllegalAccessException {
+
+    //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
+    SQLController sqlController = SQLController.getInstance();
+    List<UserReview> userReviews = new ArrayList<>();
+
+    String statementString = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT",
+        "    HostSIN, RenterSIN, Comment, Rating",
+        "FROM",
+        "    RenterReview",
+        "WHERE",
+        "    RenterReview.RenterSIN = ?",
+        ";");
+    PreparedStatement getBookingStatement = sqlController
+        .prepareStatement(statementString);
+    getBookingStatement.setString(1, renterSin);
+    ResultSet resultSet = getBookingStatement.executeQuery();
+
+    while (resultSet.next()) {
+      UserReview review = new UserReview();
+      review.setHostSin(resultSet.getString("HostSIN"));
+      review.setRenterSin(renterSin);
+      review.setComment(resultSet.getString("Comment"));
+      review.setRating(resultSet.getInt("Rating"));
+
+      userReviews.add(review);
+    }
+
+    return userReviews;
+  }
+
+
+  /**
+   *
+   * @param renterSin
+   * @return
+   * @throws SQLException
+   * @throws IllegalAccessException
+   */
+  public static List<UserReview> getAllRenterReviewsByHostSin(String
+      hostSin) throws SQLException, IllegalAccessException {
+
+    //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
+    SQLController sqlController = SQLController.getInstance();
+    List<UserReview> userReviews = new ArrayList<>();
+
+    String statementString = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT",
+        "    HostSIN, RenterSIN, Comment, Rating",
+        "FROM",
+        "    RenterReview",
+        "WHERE",
+        "    RenterReview.HostSIN = ?",
+        ";");
+    PreparedStatement getBookingStatement = sqlController
+        .prepareStatement(statementString);
+    getBookingStatement.setString(1, hostSin);
+    ResultSet resultSet = getBookingStatement.executeQuery();
+
+    while (resultSet.next()) {
+      UserReview review = new UserReview();
+      review.setHostSin(hostSin);
+      review.setRenterSin(resultSet.getString("RenterSIN"));
+      review.setComment(resultSet.getString("Comment"));
+      review.setRating(resultSet.getInt("Rating"));
+
+      userReviews.add(review);
+    }
+
+    return userReviews;
+  }
 
 }
