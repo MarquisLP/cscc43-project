@@ -250,67 +250,30 @@ public class ListingRepository {
         String statementString = String.join(System.getProperty("line.separator"),
                 "",
                 "SELECT",
-                "    PostalCode",
-                "    , Country",
+                "   l.ListingID",
+                "   , l.type",
+                "   , l.Latitude",
+                "   , l.Longitude",
+                "   , ad.PostalCode",
+                "   , ad.City",
+                "   , ad.Country",
+                "   , am.NumberOfGuests",
+                "   , am.Bathrooms",
+                "   , am.Bedrooms",
+                "   , am.Beds",
+                "   , am.Kitchen",
+                "   , am.ParkingSpots",
                 "FROM",
-                "    LocatedAt",
+                "   Listing AS l",
+                "   INNER JOIN LocatedAt AS la ON la.ListingID = l.ListingID",
+                "   INNER JOIN Address AS ad ON (ad.PostalCode = la.PostalCode AND ad.Country = la.Country)",
+                "   INNER JOIN Amenities AS am ON am.ListingID = l.ListingID",
                 "WHERE",
-                "    ListingID = ?",
+                "   l.ListingID = ?",
                 ";");
-        PreparedStatement getLocatedAtStatement = sqlController.prepareStatement(statementString);
-        getLocatedAtStatement.setString(1, listingId);
-        ResultSet locatedAtResults = getLocatedAtStatement.executeQuery();
-        locatedAtResults.first();
-        statementString = String.join(System.getProperty("line.separator"),
-                "",
-                "SELECT",
-                "    City",
-                "FROM",
-                "    Address",
-                "WHERE",
-                "    PostalCode = ?",
-                "    AND Country = ?",
-                ";");
-        PreparedStatement getAddressStatement = sqlController.prepareStatement(statementString);
-        getAddressStatement.setString(1, locatedAtResults.getString("PostalCode"));
-        getAddressStatement.setString(2, locatedAtResults.getString("Country"));
-        ResultSet addressResults = getAddressStatement.executeQuery();
-        addressResults.first();
-        Address address = new Address(
-                locatedAtResults.getString("PostalCode"),
-                addressResults.getString("City"),
-                locatedAtResults.getString("Country")
-        );
-
-        /*
-         * Get the listing's amenities.
-         */
-        statementString = String.join(System.getProperty("line.separator"),
-                "",
-                "SELECT",
-                "    NumberOfGuests",
-                "    , Bathrooms",
-                "    , Bedrooms",
-                "    , Beds",
-                "    , Kitchen",
-                "    , Parkingspots",
-                "FROM",
-                "    Amenities",
-                "WHERE",
-                "    ListingID = ?",
-                ";");
-        PreparedStatement getAmenitiesStatement = sqlController.prepareStatement(statementString);
-        getAmenitiesStatement.setString(1, listingId);
-        ResultSet amenitiesResult = getAmenitiesStatement.executeQuery();
-        amenitiesResult.first();
-        Amenities amenities = new Amenities(
-                amenitiesResult.getInt("NumberOfGuests"),
-                amenitiesResult.getDouble("Bathrooms"),
-                amenitiesResult.getInt("Bedrooms"),
-                amenitiesResult.getInt("Beds"),
-                amenitiesResult.getInt("Kitchen"),
-                amenitiesResult.getInt("ParkingSpots")
-        );
+        PreparedStatement getListingsStatement = sqlController.prepareStatement(statementString);
+        getListingsStatement.setString(1, listingId);
+        ResultSet getListingsResults = getListingsStatement.executeQuery();
 
         /*
          * Get the listing's availabilities.
@@ -351,30 +314,25 @@ public class ListingRepository {
             availabilities.add(availability);
         }
 
-        /*
-         * Get the listing's general info.
-         */
-        statementString = String.join(System.getProperty("line.separator"),
-                "",
-                "SELECT",
-                "    Type",
-                "    , Longitude",
-                "    , Latitude",
-                "FROM",
-                "    Listing",
-                "WHERE",
-                "    ListingID = ?",
-                ";");
-        PreparedStatement getListingStatement = sqlController.prepareStatement(statementString);
-        getListingStatement.setString(1, listingId);
-        ResultSet listingResult = getListingStatement.executeQuery();
-        listingResult.first();
-
+        getListingsResults.first();
+        Address address = new Address(
+                getListingsResults.getString("PostalCode"),
+                getListingsResults.getString("City"),
+                getListingsResults.getString("Country")
+        );
+        Amenities amenities = new Amenities(
+                getListingsResults.getInt("NumberOfGuests"),
+                getListingsResults.getDouble("Bathrooms"),
+                getListingsResults.getInt("Bedrooms"),
+                getListingsResults.getInt("Beds"),
+                getListingsResults.getInt("Kitchen"),
+                getListingsResults.getInt("ParkingSpots")
+        );
         return new Listing(
                 listingId,
-                listingResult.getString("Type"),
-                listingResult.getDouble("Latitude"),
-                listingResult.getDouble("Longitude"),
+                getListingsResults.getString("Type"),
+                getListingsResults.getDouble("Latitude"),
+                getListingsResults.getDouble("Longitude"),
                 address,
                 amenities,
                 availabilities
