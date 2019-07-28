@@ -14,19 +14,20 @@ CREATE TABLE Availability (
     ListingID CHAR(20) NOT NULL,
     StartDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     EndDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-    Price INT NOT NULL,
+    Price INT NOT NULL CHECK (Price >= 0),
     PRIMARY KEY (ListingID, StartDate, EndDate),
-    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID) ON DELETE CASCADE
+    FOREIGN KEY (ListingID) REFERENCES Listing(ListingID) ON DELETE CASCADE,
+    CHECK (StartDate <= EndDate)
 );
 
 CREATE TABLE Amenities (
     ListingID CHAR(20),
-    NumberOfGuests INT DEFAULT 1,
-    Bathrooms REAL DEFAULT 0,
-    Bedrooms INT DEFAULT 0,
-    Beds INT DEFAULT 0,
-    Kitchen INT DEFAULT 0,
-    ParkingSpots INT DEFAULT 0,
+    NumberOfGuests INT DEFAULT 1 CHECK (NumberOfGuests >= 0),
+    Bathrooms REAL DEFAULT 0 CHECK (Bathroooms >= 0),
+    Bedrooms INT DEFAULT 0 CHECK (Bedrooms >= 0),
+    Beds INT DEFAULT 0 CHECK (Beds >= 0),
+    Kitchen INT DEFAULT 0 CHECK (Kitchen >= 0),
+    ParkingSpots INT DEFAULT 0 CHECK (ParkingSpots >= 0),
     FOREIGN KEY (ListingID) REFERENCES  Listing(ListingID) ON DELETE CASCADE
 );
 
