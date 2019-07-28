@@ -358,7 +358,38 @@ public class ListingRepository {
 
         while (hostedByResults.next()) {
             String listingId = hostedByResults.getString("ListingID");
-            listings.add(getListingById(listingId));
+            Listing listing = getListingById(listingId);
+
+            // Get bookings for that listing
+            statementString = String.join(System.getProperty("line.separator"),
+                    "",
+                    "SELECT",
+                    "    StartDate",
+                    "   , EndDate",
+                    "   , SIN",
+                    "   , Cancelled",
+                    "FROM",
+                    "    Booking",
+                    "WHERE",
+                    "    ListingID = ?",
+                    ";");
+            PreparedStatement getBookingsStatement = sqlController.prepareStatement(statementString);
+            getBookingsStatement.setString(1, listingId);
+            ResultSet getBookingsResults = getBookingsStatement.executeQuery();
+            List<Booking> bookings = new ArrayList<>();
+            while (getBookingsResults.next()) {
+                Booking booking = new Booking(
+                        listingId,
+                        getBookingsResults.getTimestamp("StartDate"),
+                        getBookingsResults.getTimestamp("EndDate"),
+                        getBookingsResults.getString("SIN"),
+                        getBookingsResults.getBoolean("Cancelled")
+                );
+                bookings.add(booking);
+            }
+            listing.setBookings(bookings);
+
+            listings.add(listing);
         }
 
         return listings;
