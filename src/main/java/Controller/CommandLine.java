@@ -1,7 +1,8 @@
 
 package Controller;
 
-import database.AvailabilityRepository;
+import Controller.HostMenus.HostMenu;
+import Controller.RenterMenus.RenterMenu;
 import database.BookingRepository;
 import database.HostRepository;
 import database.ReviewRepository;
@@ -122,9 +123,11 @@ public class CommandLine {
       }
 
       if (user instanceof Host) {
-        return hostMenu();
+        HostMenu.hostMenu((Host) user);
+        return true;
       } else {
-        return renterMenu();
+        RenterMenu.renterMenu((Renter) user);
+        return true;
       }
     } else {
       System.out.println("");
