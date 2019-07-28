@@ -25,6 +25,7 @@ public class HostMenu {
 
             switch (input) {
                 case "1":
+                    CreateListingMenu.createListing(host);
                     break;
                 case "2":
                     break;
