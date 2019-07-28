@@ -31,6 +31,7 @@ public class ManageListingsMenu {
                     ViewHostListingsMenu.viewHostListings(host);
                     break;
                 case "2":
+                    HostCancelBookingMenu.cancelBooking(host);
                     break;
                 case "3":
                     break;
