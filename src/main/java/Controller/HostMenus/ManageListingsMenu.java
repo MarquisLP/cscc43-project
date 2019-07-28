@@ -34,6 +34,7 @@ public class ManageListingsMenu {
                     HostCancelBookingMenu.cancelBooking(host);
                     break;
                 case "3":
+                    AddAvailabilityMenu.addAvailability(host);
                     break;
                 case "4":
                     break;
