@@ -40,6 +40,7 @@ public class ManageListingsMenu {
                     AddAvailabilityMenu.addAvailability(host);
                     break;
                 case "4":
+                    UpdateAvailabilityPriceMenu.updateAvailabilityPrice(host);
                     break;
                 case "5":
                     break;
