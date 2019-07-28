@@ -425,7 +425,6 @@ public class BookingRepository {
 
     while (resultSet.next()) {
       Booking booking = new Booking();
-      resultSet.first();
       booking.setListingID(resultSet.getString("ListingID"));
       Timestamp starttime = (resultSet.getTimestamp("StartDate"));
       booking.setStartDate(starttime);
