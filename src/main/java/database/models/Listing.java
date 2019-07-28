@@ -131,15 +131,28 @@ public class Listing {
                 .append(getAmenities().toString())
                 .append("\n");
 
-        int availibilityIndex = 0;
-        for (Availability availability : getAvailabilities()) {
-            returnString.append(availability);
-            availibilityIndex++;
-            if (availibilityIndex % 3 == 0) {
-                returnString.append("\n");
-            }
-            else {
-                returnString.append(" ");
+        if (getAvailabilities().size() == 0) {
+            returnString.append("NO AVAILABLE TIMESLOTS");
+        }
+        else {
+            returnString.append("AVAILABLE TIMESLOTS:\n");
+            int availibilityIndex = 0;
+            for (Availability availability : getAvailabilities()) {
+                returnString.append("[ Start: ");
+                returnString.append(availability.getStartDate());
+                returnString.append(",  End: ");
+                returnString.append(availability.getEndDate());
+                returnString.append(", Price: ");
+                returnString.append(availability.getPrice());
+                returnString.append(" ]");
+
+                availibilityIndex++;
+                if (availibilityIndex % 3 == 0) {
+                    returnString.append("\n");
+                }
+                else {
+                    returnString.append(" ");
+                }
             }
         }
 
