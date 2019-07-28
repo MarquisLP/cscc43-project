@@ -97,7 +97,7 @@ CREATE TABLE ListingReview (
     ListingID CHAR(20) NOT NULL,
     SIN VARCHAR(20) NOT NULL,
     Comment VARCHAR(250),
-    Rating INT NOT NULL,
+    Rating INT NOT NULL CHECK (Rating >= 1 AND Rating <= 5),
     FOREIGN KEY (ListingID) REFERENCES Listing(ListingID) ON DELETE CASCADE,
     FOREIGN KEY (SIN) REFERENCES Renter(SIN)
 );
@@ -107,7 +107,7 @@ CREATE TABLE HostReview (
     HostSIN VARCHAR(20) NOT NULL,
     RenterSIN VARCHAR(20) NOT NULL,
     Comment VARCHAR(250),
-    Rating INT NOT NULL,
+    Rating INT NOT NULL CHECK (Rating >= 1 AND Rating <= 5),
     FOREIGN KEY (HostSIN) REFERENCES Host(SIN) ON DELETE CASCADE,
     FOREIGN KEY (RenterSIN) REFERENCES Renter(SIN)
 );
@@ -116,7 +116,7 @@ CREATE TABLE RenterReview (
     HostSIN VARCHAR(20) NOT NULL,
     RenterSIN VARCHAR(20) NOT NULL,
     Comment VARCHAR(250),
-    Rating INTEGER NOT NULL,
+    Rating INT NOT NULL CHECK (Rating >= 1 AND Rating <= 5),
     FOREIGN KEY (RenterSIN) REFERENCES Renter(SIN) ON DELETE CASCADE,
     FOREIGN KEY (HostSIN) REFERENCES Host(SIN)
 );
