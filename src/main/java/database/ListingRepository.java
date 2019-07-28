@@ -753,4 +753,161 @@ public class ListingRepository {
 
         return availabilities;
     }
+
+    public static List<Availability> getListingsAtExactAddress(Address address,
+                                                               ListingQueryOptions queryOptions) throws SQLException {
+        List<Availability> availabilities = new ArrayList<>();
+
+        SQLController sqlController = SQLController.getInstance();
+        // Latitude-Longitude distance calculation query from Kaletha on StackOverflow:
+        // https://stackoverflow.com/a/5548877
+        String statementString = String.join(System.getProperty("line.separator"),
+                "",
+                "SELECT",
+                "    l.ListingID",
+                "    , av.StartDate",
+                "    , av.EndDate",
+                "    , av.Price",
+                "FROM",
+                "   Listing AS l",
+                "   INNER JOIN LocatedAt AS la ON la.ListingID = l.ListingID",
+                "   INNER JOIN Address AS ad ON (",
+                "       ad.PostalCode = la.PostalCode",
+                "       AND ad.Country = la.Country",
+                "   )",
+                "   INNER JOIN Availability AS av ON av.ListingID = l.ListingID",
+                "   INNER JOIN Amenities AS am ON am.ListingID = l.ListingID",
+                "WHERE",
+                "   NOT EXISTS (",
+                "       SELECT",
+                "           *",
+                "       FROM",
+                "           Booking AS b",
+                "       WHERE",
+                "           b.ListingID = l.ListingID",
+                "           AND b.StartDate = av.StartDate",
+                "           AND b.EndDate = av.EndDate",
+                "           AND b.Cancelled = 0",
+                "   )",
+                "   AND ad.PostalCode = ?",
+                "   AND ad.City = ?",
+                "   AND ad.Country = ?",
+                "   AND ((? is NULL) OR (l.Type = ?))",
+                "   AND ((? is NULL) OR (av.Price <= ?))",
+                "   AND ((? is NULL) OR (am.NumberOfGuests <= ?))",
+                "   AND ((? is NULL) OR (am.Bathrooms <= ?))",
+                "   AND ((? is NULL) OR (am.Bedrooms <= ?))",
+                "   AND ((? is NULL) OR (am.Beds <= ?))",
+                "   AND ((? is NULL) OR (am.Kitchen <= ?))",
+                "   AND ((? is NULL) OR (am.ParkingSpots <= ?))",
+                "   AND ((? is NULL) OR (av.StartDate >= ?))",
+                "   AND ((? is NULL) OR (av.EndDate <= ?))"
+        );
+        if (queryOptions.getSortOrder().equals(SortOrder.ASCENDING)) {
+            statementString += "ORDER BY av.Price ASC";
+        }
+        else if (queryOptions.getSortOrder().equals(SortOrder.DESCENDING)) {
+            statementString += "ORDER BY av.Price DESC";
+        }
+        PreparedStatement getListingsStatement = sqlController.prepareStatement(statementString);
+        getListingsStatement.setString(1, address.getPostalCode().toLowerCase());
+        getListingsStatement.setString(2, address.getCity().toLowerCase());
+        getListingsStatement.setString(3, address.getCountry().toLowerCase());
+
+        // Optional query filters
+        if (queryOptions.getType() == null) {
+            getListingsStatement.setNull(4, Types.VARCHAR);
+            getListingsStatement.setNull(5, Types.VARCHAR);
+        }
+        else {
+            getListingsStatement.setString(4, queryOptions.getType());
+            getListingsStatement.setString(5, queryOptions.getType());
+        }
+        if (queryOptions.getMaxPrice() == null) {
+            getListingsStatement.setNull(6, Types.INTEGER);
+            getListingsStatement.setNull(7, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(6, queryOptions.getMaxPrice());
+            getListingsStatement.setInt(7, queryOptions.getMaxPrice());
+        }
+        if (queryOptions.getMinNumberOfGuests() == null) {
+            getListingsStatement.setNull(8, Types.INTEGER);
+            getListingsStatement.setNull(9, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(8, queryOptions.getMinNumberOfGuests());
+            getListingsStatement.setInt(9, queryOptions.getMinNumberOfGuests());
+        }
+        if (queryOptions.getMinBathrooms() == null) {
+            getListingsStatement.setNull(10, Types.DOUBLE);
+            getListingsStatement.setNull(11, Types.DOUBLE);
+        }
+        else {
+            getListingsStatement.setDouble(10, queryOptions.getMinBathrooms());
+            getListingsStatement.setDouble(11, queryOptions.getMinBathrooms());
+        }
+        if (queryOptions.getMinBedrooms() == null) {
+            getListingsStatement.setNull(12, Types.INTEGER);
+            getListingsStatement.setNull(13, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(12, queryOptions.getMinBedrooms());
+            getListingsStatement.setInt(13, queryOptions.getMinBedrooms());
+        }
+        if (queryOptions.getMinBeds() == null) {
+            getListingsStatement.setNull(14, Types.INTEGER);
+            getListingsStatement.setNull(15, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(14, queryOptions.getMinBeds());
+            getListingsStatement.setInt(15, queryOptions.getMinBeds());
+        }
+        if (queryOptions.getMinKitchens() == null) {
+            getListingsStatement.setNull(16, Types.INTEGER);
+            getListingsStatement.setNull(17, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(16, queryOptions.getMinKitchens());
+            getListingsStatement.setInt(17, queryOptions.getMinKitchens());
+        }
+        if (queryOptions.getMinParkingSpots() == null) {
+            getListingsStatement.setNull(18, Types.INTEGER);
+            getListingsStatement.setNull(19, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setInt(18, queryOptions.getMinParkingSpots());
+            getListingsStatement.setInt(19, queryOptions.getMinParkingSpots());
+        }
+        if (queryOptions.getStartDate() == null) {
+            getListingsStatement.setNull(20, Types.INTEGER);
+            getListingsStatement.setNull(21, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setTimestamp(20, queryOptions.getStartDate());
+            getListingsStatement.setTimestamp(21, queryOptions.getStartDate());
+        }
+        if (queryOptions.getEndDate() == null) {
+            getListingsStatement.setNull(22, Types.INTEGER);
+            getListingsStatement.setNull(23, Types.INTEGER);
+        }
+        else {
+            getListingsStatement.setTimestamp(22, queryOptions.getEndDate());
+            getListingsStatement.setTimestamp(23, queryOptions.getEndDate());
+        }
+
+        ResultSet getListingResults = getListingsStatement.executeQuery();
+
+        while (getListingResults.next()) {
+            Availability availability = new Availability(
+                    getListingResults.getString("ListingID"),
+                    getListingResults.getTimestamp("StartDate"),
+                    getListingResults.getTimestamp("EndDate"),
+                    getListingResults.getInt("Price")
+            );
+            availabilities.add(availability);
+        }
+
+        return availabilities;
+    }
 }
