@@ -14,8 +14,8 @@ public class HostMenu {
             System.out.println();
             System.out.println("========HOST MENU=========");
             System.out.println("1. Create a new listing");
-            System.out.println("2. View my listings");
-            System.out.println("3. Edit a listing");
+            System.out.println("2. Manage my listings");
+            System.out.println("3. Review a renter");
             System.out.println("4. Go to account menu");
             System.out.println("5. View reports");
             System.out.println("6. Exit");
@@ -28,6 +28,7 @@ public class HostMenu {
                     CreateListingMenu.createListing(host);
                     break;
                 case "2":
+                    ManageListingsMenu.manageListingsMenu(host);
                     break;
                 case "3":
                     break;
