@@ -167,6 +167,62 @@ CREATE TRIGGER InsertListingReviewChecker BEFORE INSERT ON ListingReview
 DELIMITER ;
 
 DELIMITER //
+CREATE TRIGGER InsertHostReviewChecker BEFORE INSERT ON HostReview
+    FOR EACH ROW
+    BEGIN
+        IF NOT EXISTS (
+            SELECT
+                *
+            FROM
+                HostedBy AS h
+                INNER JOIN Listing AS l
+                INNER JOIN Availability AS a
+                INNER JOIN Booking AS b ON (
+                    h.ListingID = l.ListingID
+                    AND h.ListingID = b.ListingID
+                )
+            WHERE
+                b.Cancelled = 0
+                AND b.SIN = NEW.RenterSIN
+                AND b.ListingID = h.ListingID
+                AND h.SIN = NEW.HostSIN
+                AND a.EndDate < CURRENT_TIMESTAMP
+        ) THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'REJECTED';
+        END IF;
+    END//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER InsertRenterReviewChecker BEFORE INSERT ON RenterReview
+    FOR EACH ROW
+    BEGIN
+        IF NOT EXISTS (
+            SELECT
+                *
+            FROM
+                HostedBy AS h
+                INNER JOIN Listing AS l
+                INNER JOIN Availability AS a
+                INNER JOIN Booking AS b ON (
+                    h.ListingID = l.ListingID
+                    AND h.ListingID = b.ListingID
+                )
+            WHERE
+                b.Cancelled = 0
+                AND b.SIN = NEW.RenterSIN
+                AND b.ListingID = h.ListingID
+                AND h.SIN = NEW.HostSIN
+                AND a.EndDate < CURRENT_TIMESTAMP
+        ) THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'REJECTED';
+        END IF;
+    END//
+DELIMITER ;
+
+DELIMITER //
 CREATE TRIGGER UpdateAvailabilityChecker BEFORE UPDATE ON Availability
     FOR EACH ROW
     BEGIN

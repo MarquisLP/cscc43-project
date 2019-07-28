@@ -1,8 +1,10 @@
 
 package Controller;
 
+import database.AvailabilityRepository;
 import database.BookingRepository;
 import database.HostRepository;
+import database.ReviewRepository;
 import database.SQLController;
 import database.UserRepository;
 import database.models.Address;
@@ -330,13 +332,39 @@ public class CommandLine {
       System.out.println(user.toString());
 
       BookingRepository
-          .booking("testlisting", "2019-12-01", "2019-12-10", user);
+          .booking("testlisting", "2018-12-01", "2018-12-10", user);
       Booking booking = BookingRepository
-          .getBooking("testlisting", "2019-12-01", "2019-12-10", user);
+          .getBooking("testlisting", "2018-12-01", "2018-12-10", user);
 
       System.out.println("BOOKING!!!!!!!!!!!!!!");
       System.out.println(booking.toString());
 
+      //BookingRepository
+      //    .deleteBooking("testlisting", "2018-12-01", "2018-12-10", user);
+
+
+      /*
+      THE LISITING TESTS
+       */
+      ReviewRepository.createListingReview("testlisting", "testrsin", "l "
+          + "review", 1);
+
+      //DID NOT STAY AT LISTING
+      //ReviewRepository.createListingReview("testlisting", "rentersin", "l "
+      //    + "review", 1);
+
+
+      /*
+      THE HOST REVIEWS
+       */
+      //Proper Test
+      ReviewRepository.createHostReview("testhsin", "testrsin", "PROPER TEST "
+          + "HOST REVIEW", 1);
+
+      //Bad Dates Test but booked
+
+
+      //BOOKING CANCELLING
       BookingRepository
           .cancelBooking("testlisting", "2018-12-01", "2018-12-10", user);
       booking = BookingRepository
@@ -345,8 +373,13 @@ public class CommandLine {
       System.out.println("CANCELLED TESTING!!!!!!!!!!!!!!");
       System.out.println(booking.toString());
 
-      BookingRepository
-          .deleteBooking("testlisting", "2018-12-01", "2018-12-10", user);
+      //Not booked at all GOOD
+      //ReviewRepository.createHostReview("testhsin", "rentersin", "USER NOT "
+      //        + "BOOKED", 1);
+
+      //cancelled GOOD
+      //ReviewRepository.createHostReview("testhsin", "testrsin", "CANCELLED "
+      //    + "TESTING SHOULD NOT APPEAR", 1);
 
       System.out.println("DELETE TESTING!!!!!!!!!!!!!!");
 
