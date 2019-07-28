@@ -46,6 +46,7 @@ public class ManageListingsMenu {
                     UpdateAvailabilityDateRangeMenu.updateAvailabilityDateRange(host);
                     break;
                 case "6":
+                    DeleteListingMenu.deleteListing(host);
                     break;
                 default:
                     System.out.println("Invalid option.");
