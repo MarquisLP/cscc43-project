@@ -4,7 +4,7 @@ INSERT INTO Listing (ListingID, Type, Latitude, Longitude)
     VALUES ("listing", "House", 100, 100);
 
 INSERT INTO Availability (ListingID, StartDate, EndDate, Price)
-    VALUES("listing", "2019-12-01", "2019-12-10", 250);
+    VALUES("listing", "2018-12-01", "2018-12-10", 250);
 
 INSERT INTO Amenities (ListingID, NumberOfGuests, Bathrooms, Bedrooms, Beds, Kitchen, ParkingSpots)
     VALUES("listing", 1, 1, 1, 1, 1, 1);
@@ -40,7 +40,7 @@ INSERT INTO HostedBy (ListingID, SIN)
     VALUES("listing", "hostsin");
 
 INSERT INTO Booking (ListingID, StartDate, EndDate, SIN, Cancelled)
-    VALUES("listing", "2019-12-01", "2019-12-10", "rentersin", 0);
+    VALUES("listing", "2018-12-01", "2018-12-10", "rentersin", 0);
 
 INSERT INTO ListingReview (ListingID, SIN, Comment, Rating)
     VALUES("listing", "rentersin", "l review", 1);
@@ -61,7 +61,7 @@ INSERT INTO Listing (ListingID, Type, Latitude, Longitude)
     VALUES ("testlisting", "House", 100, 100);
 
 INSERT INTO Availability (ListingID, StartDate, EndDate, Price)
-    VALUES("testlisting", "2019-12-01", "2019-12-10", 250);
+    VALUES("testlisting", "2018-12-01", "2018-12-10", 250);
 
 INSERT INTO Amenities (ListingID, NumberOfGuests, Bathrooms, Bedrooms, Beds, Kitchen, ParkingSpots)
     VALUES("testlisting", 1, 1, 1, 1, 1, 1);
