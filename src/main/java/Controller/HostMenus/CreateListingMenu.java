@@ -5,9 +5,13 @@ import database.SQLController;
 import database.models.*;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.TimeZone;
 
 public class CreateListingMenu {
     public static void createListing(Host host) {
@@ -38,9 +42,7 @@ public class CreateListingMenu {
         Amenities amenities = new Amenities(numberOfGuests, bathrooms, bedrooms, beds, kitchens, parkingSpots);
 
         // Availabilities
-        //TODO: Implement getAvailabilities()
-        //List<Availability> availabilities = getAvailabilities(sc);
-        List<Availability> availabilities = new ArrayList<>();
+        List<Availability> availabilities = getAvailabilities(sc);
 
         // Insert Listing into database
         Listing newListing = new Listing(type, latitude, longitude, address, amenities, availabilities);
@@ -300,6 +302,78 @@ public class CreateListingMenu {
         } while (parkingSpots == null);
 
         return parkingSpots;
+    }
+
+    /*
+     * Availabilities
+     */
+    private static List<Availability> getAvailabilities(Scanner sc) {
+        List<Availability> availabilities = new ArrayList<>();
+        boolean continueAsking = true;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Availability nextAvailability = null;
+
+        System.out.println("AVAILABITIES");
+        System.out.println("Enter availabilities in the following format:");
+        System.out.println("    yyyy-MM-dd yyyy-MM-dd price");
+        do {
+            nextAvailability = getAvailability(sc, dateFormat);
+            if (nextAvailability != null) {
+                availabilities.add(nextAvailability);
+                System.out.println("Availability added to the listing successfully.");
+            }
+        } while (nextAvailability != null);
+
+        return availabilities;
+    }
+
+    private static Availability getAvailability(Scanner sc, SimpleDateFormat dateFormat) {
+        String input;
+        Availability availability = null;
+
+        do {
+            System.out.print("Enter availability (or leave blank to finish): ");
+            input = sc.nextLine();
+
+            if (input.equals("")) {
+                return null;
+            }
+
+            String[] fields = input.split("\\s+");
+            if (fields.length != 3) {
+                System.out.println("Invalid number of fields");
+                continue;
+            }
+
+            Timestamp startDate;
+            try {
+                startDate = new Timestamp((dateFormat.parse(fields[0]).getTime()));
+            } catch (ParseException exception) {
+                System.out.println("Invalid format for start date");
+                continue;
+            }
+
+            Timestamp endDate;
+            try {
+                endDate = new Timestamp((dateFormat.parse(fields[1]).getTime()));
+            } catch (ParseException exception) {
+                System.out.println("Invalid format for end date");
+                continue;
+            }
+
+            int price;
+            try {
+                price = Integer.parseInt(fields[2]);
+            } catch (NumberFormatException exception) {
+                System.out.println("Price must be a whole number");
+                continue;
+            }
+
+            availability = new Availability("", startDate, endDate, price);
+        } while (availability == null);
+
+        return availability;
     }
 
 }
