@@ -179,6 +179,7 @@ public class BookingRepository {
         "    Booking.ListingID = ?",
         "    AND Booking.StartDate = ?",
         "    AND Booking.EndDate = ?",
+        "    AND Booking.SIN = ?",
         ";");
     PreparedStatement updateBookingStatement = sqlController
         .prepareStatement(statementString);
@@ -186,7 +187,7 @@ public class BookingRepository {
     updateBookingStatement.setString(2, booking.getListingID());
     updateBookingStatement.setTimestamp(3, booking.getStartDate());
     updateBookingStatement.setTimestamp(4, booking.getEndDate());
-    updateBookingStatement.setString(5, booking.getSin());
+    updateBookingStatement.setString(5, user.getSin());
     updateBookingStatement.executeUpdate();
   }
 
