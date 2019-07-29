@@ -18,8 +18,9 @@ public class HostMenu {
             System.out.println("2. Manage my listings");
             System.out.println("3. View renters that rented from me");
             System.out.println("4. Review a renter");
-            System.out.println("5. View reviews about me");
-            System.out.println("6. View reports");
+            System.out.println("5. View renter reviews I've submitted");
+            System.out.println("6. View reviews about me");
+            System.out.println("7. View reports");
 
             System.out.print("Enter the number of one of the options above: ");
             input = sc.nextLine();
@@ -41,10 +42,11 @@ public class HostMenu {
                     ReviewRenterMenu.reviewRenter(host);
                     break;
                 case "5":
-                    ViewHostReviewsMenu.viewHostReviews(host);
+                    ViewSubmittedRenterReviewsMenu.viewSubmittedRenterReviews(host);
                     break;
                 case "6":
-                    return;
+                    ViewHostReviewsMenu.viewHostReviews(host);
+                    break;
                 default:
                     System.out.println("Invalid option.");
                     break;
