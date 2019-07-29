@@ -101,6 +101,46 @@ public class ReportsMenu {
                         System.out.println("An error occurred. Please contact your administrator for help.");
                     }
                     break;
+                case "3":
+                    try {
+                        ReportRepository.reportlistingpercountry();
+                    } catch (SQLException exception) {
+                        exception.printStackTrace();
+                        System.out.println("An error occurred. Please contact your administrator for help.");
+                    }
+                    break;
+                case "4":
+                    try {
+                        ReportRepository.reportlistingpercountryandcity();
+                    } catch (SQLException exception) {
+                        exception.printStackTrace();
+                        System.out.println("An error occurred. Please contact your administrator for help.");
+                    }
+                    break;
+                case "5":
+                    try {
+                        ReportRepository.reportlistingpercountryandcityandpostal();
+                    } catch (SQLException exception) {
+                        exception.printStackTrace();
+                        System.out.println("An error occurred. Please contact your administrator for help.");
+                    }
+                    break;
+                case "6":
+                    try {
+                        ReportRepository.rankHostByTotalListingPerCountry();
+                    } catch (SQLException exception) {
+                        exception.printStackTrace();
+                        System.out.println("An error occurred. Please contact your administrator for help.");
+                    }
+                    break;
+                case "7":
+                    try {
+                        ReportRepository.rankHostByTotalListingRefinedToCity();
+                    } catch (SQLException exception) {
+                        exception.printStackTrace();
+                        System.out.println("An error occurred. Please contact your administrator for help.");
+                    }
+                    break;
                 default:
                     break;
             }
