@@ -96,5 +96,330 @@ INSERT INTO ResidesAt (SIN, Country, PostalCode)
 INSERT INTO ResidesAt (SIN, Country, PostalCode)
     VALUES("testrsin", "testrc", "testrp");
 
+
+
+
 INSERT INTO HostedBy (ListingID, SIN)
     VALUES("testlisting", "testhsin");
+
+
+
+
+
+
+
+-- Renters for reporting
+
+
+-- Canada
+INSERT INTO User (SIN, Name, Occupation, DateOfBirth)
+    VALUES("531", "Lana", "Pediatrician", "1987-03-15");
+
+INSERT INTO Renter (SIN, CreditCardNumber)
+    VALUES("531", "123456789");
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("canada", "m1f6g7", "winnipeg");
+
+INSERT INTO ResidesAt (SIN, Country, PostalCode)
+    VALUES("531", "canada", "m1f6g7");
+
+-- Germany
+INSERT INTO User (SIN, Name, Occupation, DateOfBirth)
+    VALUES("257", "Vita", "Pediatrician", "1963-03-11");
+
+INSERT INTO Renter (SIN, CreditCardNumber)
+    VALUES("257", "00105");
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("germany", "g2r3e9", "vienna");
+
+INSERT INTO ResidesAt (SIN, Country, PostalCode)
+    VALUES("257", "germany", "g2r3e9");
+
+-- Japan
+INSERT INTO User (SIN, Name, Occupation, DateOfBirth)
+    VALUES("692", "Megumi", "Idol", "1992-05-05");
+
+INSERT INTO Renter (SIN, CreditCardNumber)
+    VALUES("692", "99999");
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("japan", "j7w1u7", "tokyo");
+
+INSERT INTO ResidesAt (SIN, Country, PostalCode)
+    VALUES("692", "japan", "j7w1u7");
+
+
+
+-- Hosts for reporting
+
+-- Canada
+
+INSERT INTO User (SIN, Name, Occupation, DateOfBirth)
+    VALUES("123", "Tom", "Electrician", "1984-06-06");
+
+INSERT INTO Host (SIN)
+    VALUES("123");
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("canada", "m1q3pr", "winnipeg");
+
+INSERT INTO ResidesAt (SIN, Country, PostalCode)
+    VALUES("123", "canada", "m1q3pr");
+
+INSERT INTO User (SIN, Name, Occupation, DateOfBirth)
+    VALUES("456", "Jill", "Doctor", "1981-10-20");
+
+INSERT INTO Host (SIN)
+    VALUES("456");
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("canada", "q5r1t2", "montreal");
+
+INSERT INTO ResidesAt (SIN, Country, PostalCode)
+    VALUES("456", "canada", "q5r1t2");
+
+-- Germany
+
+INSERT INTO User (SIN, Name, Occupation, DateOfBirth)
+    VALUES("001", "Herbert", "Professor", "1984-06-06");
+
+INSERT INTO Host (SIN)
+    VALUES("001");
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("germany", "g2r1c2", "vienna");
+
+INSERT INTO ResidesAt (SIN, Country, PostalCode)
+    VALUES("001", "germany", "g2r1c2");
+
+-- Japan
+
+INSERT INTO User (SIN, Name, Occupation, DateOfBirth)
+    VALUES("105", "Shinji", "Soldier", "1995-02-01");
+
+INSERT INTO Host (SIN)
+    VALUES("105");
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("japan", "j7w1u2", "tokyo");
+
+INSERT INTO ResidesAt (SIN, Country, PostalCode)
+    VALUES("105", "japan", "j7w1u2");
+
+
+
+-- Listings for reporting
+
+-- Canada
+
+INSERT INTO Listing (ListingID, Type, Latitude, Longitude)
+    VALUES ("winnipeg1", "House", 56, 87);
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("canada", "m1q3t7", "winnipeg");
+
+INSERT INTO LocatedAt (ListingID, Country, PostalCode)
+    VALUES("winnipeg1", "canada", "m1q3t7");
+
+INSERT INTO Amenities (ListingID, NumberOfGuests, Bathrooms, Bedrooms, Beds, Kitchen, ParkingSpots)
+    VALUES("winnipeg1", 1, 0.5, 2, 3, 4, 5);
+
+INSERT INTO HostedBy (ListingID, SIN)
+    VALUES ("winnipeg1", "123");
+
+INSERT INTO Availability (ListingID, StartDate, EndDate, Price)
+    VALUES("winnipeg1", "2018-08-01", "2018-08-06", 300);
+
+
+INSERT INTO Listing (ListingID, Type, Latitude, Longitude)
+    VALUES ("winnipeg2", "Apartment", 55, 83);
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("canada", "m1r2vs", "winnipeg");
+
+INSERT INTO LocatedAt (ListingID, Country, PostalCode)
+    VALUES("winnipeg2", "canada", "m1r2vs");
+
+INSERT INTO Amenities (ListingID, NumberOfGuests, Bathrooms, Bedrooms, Beds, Kitchen, ParkingSpots)
+    VALUES("winnipeg2", 1, 2.5, 2, 3, 4, 5);
+
+INSERT INTO HostedBy (ListingID, SIN)
+    VALUES ("winnipeg2", "123");
+
+INSERT INTO Availability (ListingID, StartDate, EndDate, Price)
+    VALUES("winnipeg2", "2018-08-05", "2018-08-12", 450);
+
+
+INSERT INTO Listing (ListingID, Type, Latitude, Longitude)
+    VALUES ("quebec1", "Apartment", 55, 83);
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("canada", "q5r1t5", "montreal");
+
+INSERT INTO LocatedAt (ListingID, Country, PostalCode)
+    VALUES("quebec1", "canada", "q5r1t5");
+
+INSERT INTO Amenities (ListingID, NumberOfGuests, Bathrooms, Bedrooms, Beds, Kitchen, ParkingSpots)
+    VALUES("quebec1", 3, 3, 3, 5, 4, 2);
+
+INSERT INTO HostedBy (ListingID, SIN)
+    VALUES ("quebec1", "456");
+
+INSERT INTO Availability (ListingID, StartDate, EndDate, Price)
+    VALUES("quebec1", "2018-08-02", "2018-08-09", 700);
+
+INSERT INTO Availability (ListingID, StartDate, EndDate, Price)
+    VALUES("quebec1", "2018-11-23", "2018-11-24", 500);
+
+-- Germany
+
+INSERT INTO Listing (ListingID, Type, Latitude, Longitude)
+    VALUES ("germany1", "Apartment", 55, 83);
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("germany", "g2r1c7", "vienna");
+
+INSERT INTO LocatedAt (ListingID, Country, PostalCode)
+    VALUES("germany1", "germany", "g2r1c7");
+
+INSERT INTO Amenities (ListingID, NumberOfGuests, Bathrooms, Bedrooms, Beds, Kitchen, ParkingSpots)
+    VALUES("germany1", 6, 2, 4, 5, 4, 3);
+
+INSERT INTO HostedBy (ListingID, SIN)
+    VALUES ("germany1", "001");
+
+INSERT INTO Availability (ListingID, StartDate, EndDate, Price)
+    VALUES("germany1", "2018-08-20", "2018-08-21", 1200);
+
+INSERT INTO Availability (ListingID, StartDate, EndDate, Price)
+    VALUES("germany1", "2018-11-20", "2018-11-25", 950);
+
+-- Japan
+
+INSERT INTO Listing (ListingID, Type, Latitude, Longitude)
+    VALUES ("tokyo1", "Apartment", 55, 83);
+
+INSERT INTO Address (Country, PostalCode, City)
+    VALUES("japan", "j7w1v5", "tokyo");
+
+INSERT INTO LocatedAt (ListingID, Country, PostalCode)
+    VALUES("tokyo1", "japan", "j7w1v5");
+
+INSERT INTO Amenities (ListingID, NumberOfGuests, Bathrooms, Bedrooms, Beds, Kitchen, ParkingSpots)
+    VALUES("tokyo1", 3, 0.5, 2, 3, 1, 1);
+
+INSERT INTO HostedBy (ListingID, SIN)
+    VALUES ("tokyo1", "105");
+
+INSERT INTO Availability (ListingID, StartDate, EndDate, Price)
+    VALUES("tokyo1", "2018-08-04", "2018-08-10", 2300);
+
+INSERT INTO Availability (ListingID, StartDate, EndDate, Price)
+    VALUES("tokyo1", "2018-11-19", "2018-11-23", 2000);
+
+INSERT INTO Availability (ListingID, StartDate, EndDate, Price)
+    VALUES("tokyo1", "2018-11-26", "2018-11-29", 1600);
+
+
+
+
+
+-- Bookings for reporting
+
+-- Canada
+
+INSERT INTO Booking (ListingID, StartDate, EndDate, SIN, Cancelled)
+    VALUES("winnipeg1", "2018-08-01", "2018-08-06", "531", 0);
+
+INSERT INTO Booking (ListingID, StartDate, EndDate, SIN, Cancelled)
+    VALUES("winnipeg2", "2018-08-05", "2018-08-12", "531", 0);
+
+INSERT INTO Booking (ListingID, StartDate, EndDate, SIN, Cancelled)
+    VALUES("quebec1", "2018-11-23", "2018-11-24", "531", 0);
+
+-- Germany
+
+INSERT INTO Booking (ListingID, StartDate, EndDate, SIN, Cancelled)
+    VALUES("germany1", "2018-08-20", "2018-08-21", "257", 0);
+
+INSERT INTO Booking (ListingID, StartDate, EndDate, SIN, Cancelled)
+    VALUES("germany1", "2018-11-20", "2018-11-25", "257", 0);
+
+-- Japan
+
+INSERT INTO Booking (ListingID, StartDate, EndDate, SIN, Cancelled)
+    VALUES("tokyo1", "2018-08-04", "2018-08-10", "692", 0);
+
+INSERT INTO Booking (ListingID, StartDate, EndDate, SIN, Cancelled)
+    VALUES("tokyo1", "2018-11-19", "2018-11-23", "692", 0);
+
+INSERT INTO Booking (ListingID, StartDate, EndDate, SIN, Cancelled)
+    VALUES("tokyo1", "2018-11-26", "2018-11-29", "692", 0);
+
+
+
+
+
+-- Listing Reviews for reporting
+
+INSERT INTO ListingReview (ListingID, SIN, Comment, Rating)
+    VALUES("winnipeg1", "531", "Too much noise in the morning", 3);
+
+INSERT INTO ListingReview (ListingID, SIN, Comment, Rating)
+    VALUES("winnipeg1", "531", "Nice renovation. The morning still has the noise problems, though", 4);
+
+INSERT INTO ListingReview (ListingID, SIN, Comment, Rating)
+    VALUES("germany1", "257", "Wish I could live here forever", 5);
+
+INSERT INTO ListingReview (ListingID, SIN, Comment, Rating)
+    VALUES("tokyo1", "692", "So cramped. Receptionist is hot tho", 2);
+
+
+
+
+
+-- Host Reviews for reporting
+
+INSERT INTO HostReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("123", "531", "Very friendly. I admire his assortment of beers.", 4);
+
+INSERT INTO HostReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("123", "531", "After sharing a few beers, can say he's the best host I've ever had.", 5);
+
+INSERT INTO HostReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("001", "257", "She's nice, but seems a little strict and uptight.", 4);
+
+INSERT INTO HostReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("001", "257", "Whoa yeah, this time she was super strict. Wouldn't let me invite friends over. feelsbad", 2);
+
+INSERT INTO HostReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("001", "257", "For a soldier, he's quite a sweet boy. Lets you do whatever you want. But he insists on playing sad violin music every night.", 3);
+
+INSERT INTO HostReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("105", "692", "So much violin. Help.", 1);
+
+
+
+
+
+-- Renter Reviews for reporting
+
+INSERT INTO RenterReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("123", "531", "Very quiet. Pleasant, but a little unnerving to speak to", 2);
+
+INSERT INTO RenterReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("123", "531", "Stopped being quiet this time and is much more of a pleasure to be around.", 4);
+
+INSERT INTO RenterReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("001", "257", "Very wise and always has something intelligent to say.", 5);
+
+INSERT INTO RenterReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("001", "257", "So wise, so smart. Keep going, you.", 5);
+
+INSERT INTO RenterReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("105", "692", "Why does she keep giving me hugs? She's not my mom...", 3);
+
+INSERT INTO RenterReview (HostSIN, RenterSIN, Comment, Rating)
+    VALUES("105", "692", "I realized that I actually really like those hugs... Please come back soon.", 5);

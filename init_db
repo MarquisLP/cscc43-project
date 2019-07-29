@@ -42,7 +42,7 @@ CREATE TABLE User (
     SIN VARCHAR(20) NOT NULL,
     Name VARCHAR(30) NOT NULL,
     Occupation VARCHAR(20),
-    DateOfBirth DATE,
+    DateOfBirth DATE NOT NULL,
     PRIMARY KEY (SIN)
 );
 
@@ -242,5 +242,44 @@ CREATE TRIGGER UpdateAvailabilityChecker BEFORE UPDATE ON Availability
             SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'REJECTED';
         END IF;
+    END//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER DeleteHostChecker BEFORE DELETE ON User
+    FOR EACH ROW
+    BEGIN
+        IF EXISTS (
+            SELECT
+                *
+            FROM
+                User AS u
+                INNER JOIN Host AS h ON u.SIN = h.SIN
+                INNER JOIN HostedBy AS hb ON h.SIN = hb.SIN
+            WHERE
+                u.SIN = OLD.SIN
+        )
+        THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'REJECTED';
+        END IF;
+    END//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER DeleteHostTablePreventer BEFORE DELETE ON Host
+    FOR EACH ROW
+    BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'You may not delete from the Host table directly. Delete from User table instead.';
+    END//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER DeleteRenterTablePreventer BEFORE DELETE ON Renter
+    FOR EACH ROW
+    BEGIN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'You may not delete from the Renter table directly. Delete from User table instead.';
     END//
 DELIMITER ;

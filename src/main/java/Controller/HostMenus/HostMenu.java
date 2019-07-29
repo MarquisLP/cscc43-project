@@ -21,6 +21,7 @@ public class HostMenu {
             System.out.println("5. View renter reviews I've submitted");
             System.out.println("6. View reviews about me");
             System.out.println("7. View reports");
+            System.out.println("8. Delete my account");
 
             System.out.print("Enter the number of one of the options above: ");
             input = sc.nextLine();
@@ -46,6 +47,11 @@ public class HostMenu {
                     break;
                 case "6":
                     ViewHostReviewsMenu.viewHostReviews(host);
+                    break;
+                case "7":
+                    break;
+                case "8":
+                    DeleteHostMenu.deleteHost(host);
                     break;
                 default:
                     System.out.println("Invalid option.");
