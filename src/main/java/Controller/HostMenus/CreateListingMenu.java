@@ -41,6 +41,15 @@ public class CreateListingMenu {
         Integer parkingSpots = getParkingSpots(sc);
         Amenities amenities = new Amenities(numberOfGuests, bathrooms, bedrooms, beds, kitchens, parkingSpots);
 
+        int suggestedPrice = (
+                15 * (int)Math.ceil(amenities.getBathrooms())
+                + 30 * amenities.getBedrooms()
+                + 15 * amenities.getBeds()
+                + 25 * amenities.getKitchen()
+                + 20 * amenities.getParkingSpots()
+        );
+        System.out.println("Suggested price for your listing: $" + suggestedPrice);
+
         // Availabilities
         List<Availability> availabilities = getAvailabilities(sc);
 
