@@ -334,7 +334,7 @@ public class BookingRepository {
         "    Booking",
         "WHERE",
         "    Booking.SIN = ?",
-        "    AND Booking.Cancelled = False",
+        "    AND Booking.Cancelled = 0",
         ";");
     PreparedStatement getBookingStatement = sqlController
         .prepareStatement(statementString);
@@ -343,7 +343,6 @@ public class BookingRepository {
 
     while (resultSet.next()) {
       Booking booking = new Booking();
-      resultSet.first();
       booking.setListingID(resultSet.getString("ListingID"));
       Timestamp starttime = (resultSet.getTimestamp("StartDate"));
       booking.setStartDate(starttime);
@@ -382,7 +381,7 @@ public class BookingRepository {
         "    Booking",
         "WHERE",
         "    Booking.ListingID = ?",
-        "    AND Booking.Cancelled = False",
+        "    AND Booking.Cancelled = 0",
         ";");
     PreparedStatement getBookingStatement = sqlController
         .prepareStatement(statementString);
@@ -391,7 +390,6 @@ public class BookingRepository {
 
     while (resultSet.next()) {
       Booking booking = new Booking();
-      resultSet.first();
       booking.setListingID(resultSet.getString("ListingID"));
       Timestamp starttime = (resultSet.getTimestamp("StartDate"));
       booking.setStartDate(starttime);
@@ -434,7 +432,7 @@ public class BookingRepository {
         "    Booking",
         "WHERE",
         "    Booking.SIN = ?",
-        "    AND Booking.Cancelled = True",
+        "    AND Booking.Cancelled = 1",
         ";");
     PreparedStatement getBookingStatement = sqlController
         .prepareStatement(statementString);
@@ -443,7 +441,6 @@ public class BookingRepository {
 
     while (resultSet.next()) {
       Booking booking = new Booking();
-      resultSet.first();
       booking.setListingID(resultSet.getString("ListingID"));
       Timestamp starttime = (resultSet.getTimestamp("StartDate"));
       booking.setStartDate(starttime);
@@ -482,7 +479,7 @@ public class BookingRepository {
         "    Booking",
         "WHERE",
         "    Booking.ListingID = ?",
-        "    AND Booking.Cancelled = True",
+        "    AND Booking.Cancelled = 1",
         ";");
     PreparedStatement getBookingStatement = sqlController
         .prepareStatement(statementString);
@@ -503,4 +500,98 @@ public class BookingRepository {
 
     return allBookings;
   }
+
+
+  /**
+   *
+   * @param user
+   * @return
+   * @throws NoSuchElementException
+   * @throws SQLException
+   */
+  public static List<Booking> getAllPastBookingsByUser(User user) throws
+      NoSuchElementException, SQLException {
+
+    SQLController sqlController = SQLController.getInstance();
+
+    List<Booking> allBookings = new ArrayList<>();
+        /*
+        GETS the BOOKING the user chose from the list, if it does not
+        exist returns null.
+         */
+    String statementString = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT",
+        "    ListingID, StartDate, EndDate, SIN, Cancelled",
+        "FROM",
+        "    Booking",
+        "WHERE",
+        "    Booking.SIN = ?",
+        "    AND Booking.EndData < CURRENT_TIMESTAMP",
+        "    AND Booking.Cancelled = 0",
+        ";");
+    PreparedStatement getBookingStatement = sqlController
+        .prepareStatement(statementString);
+    getBookingStatement.setString(1, user.getSin());
+    ResultSet resultSet = getBookingStatement.executeQuery();
+
+    while (resultSet.next()) {
+      Booking booking = new Booking();
+      booking.setListingID(resultSet.getString("ListingID"));
+      Timestamp starttime = (resultSet.getTimestamp("StartDate"));
+      booking.setStartDate(starttime);
+      Timestamp endtime = (resultSet.getTimestamp("EndDate"));
+      booking.setEndDate(endtime);
+      booking.setSin(resultSet.getString("SIN"));
+      booking.setCancelled(resultSet.getBoolean("Cancelled"));
+      allBookings.add(booking);
+    }
+
+    return allBookings;
+  }
+
+
+  public static List<Booking> getAllPastBookingsByListing(String listingID)
+      throws NoSuchElementException, SQLException {
+
+    SQLController sqlController = SQLController.getInstance();
+
+    List<Booking> allBookings = new ArrayList<>();
+        /*
+        GETS the BOOKING the user chose from the list, if it does not
+        exist returns null.
+         */
+    String statementString = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT",
+        "    ListingID, StartDate, EndDate, SIN, Cancelled",
+        "FROM",
+        "    Booking",
+        "WHERE",
+        "    Booking.ListingID = ?",
+        "    AND Booking.EndData < CURRENT_TIMESTAMP",
+        "    AND Booking.Cancelled = 0",
+        ";");
+    PreparedStatement getBookingStatement = sqlController
+        .prepareStatement(statementString);
+    getBookingStatement.setString(1,listingID);
+    ResultSet resultSet = getBookingStatement.executeQuery();
+
+    while (resultSet.next()) {
+      Booking booking = new Booking();
+      booking.setListingID(resultSet.getString("ListingID"));
+      Timestamp starttime = (resultSet.getTimestamp("StartDate"));
+      booking.setStartDate(starttime);
+      Timestamp endtime = (resultSet.getTimestamp("EndDate"));
+      booking.setEndDate(endtime);
+      booking.setSin(resultSet.getString("SIN"));
+      booking.setCancelled(resultSet.getBoolean("Cancelled"));
+      allBookings.add(booking);
+    }
+
+    return allBookings;
+  }
+
+
+
 }
