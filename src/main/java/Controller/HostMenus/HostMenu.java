@@ -34,6 +34,7 @@ public class HostMenu {
                     ManageListingsMenu.manageListingsMenu(host);
                     break;
                 case "3":
+                    ReviewRenterMenu.reviewRenter(host);
                     break;
                 case "4":
                     break;

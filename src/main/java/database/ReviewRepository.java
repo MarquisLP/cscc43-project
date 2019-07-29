@@ -118,7 +118,7 @@ public class ReviewRepository {
    * @throws IllegalAccessException
    */
   public static void createRenterReview(String hostSin, String renterSin, String
-      comment, int rating) throws SQLException, IllegalAccessException {
+      comment, int rating) throws SQLException, IllegalArgumentException {
 
     //INSERTS into RENTERREVIEW Table
     try {
