@@ -35,7 +35,23 @@ public class RenterRepository {
     insertHostStatement.executeUpdate();
   }
 
+  public static void deleteRenterAccount(Renter renter) throws SQLException, NoSuchElementException {
+    String statementString = String.join(System.getProperty("line.separator"),
+            "",
+            "DELETE FROM",
+            "    User",
+            "WHERE",
+            "    SIN = ?",
+            ";");
+    SQLController sqlController = SQLController.getInstance();
+    PreparedStatement deleteUserStatement = sqlController.prepareStatement(statementString);
+    deleteUserStatement.setString(1, renter.getSin());
 
-
+    int numRowsDeleted = 0;
+    numRowsDeleted = deleteUserStatement.executeUpdate();
+    if (numRowsDeleted == 0) {
+      throw new NoSuchElementException();
+    }
+  }
 
 }
