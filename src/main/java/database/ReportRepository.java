@@ -1,7 +1,6 @@
 package database;
 
 import database.models.ListingReview;
-import database.models.ReportByNumberInCity;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,12 +9,17 @@ import java.util.List;
 
 public class ReportRepository {
 
-  public static List<ReportByNumberInCity> reportByDateRangeInCity(String startDate, String
+  /**
+   *
+   * @param startDate
+   * @param endDate
+   * @throws SQLException
+   */
+  public static void reportByDateRangeInCity(String startDate, String
       endDate) throws SQLException {
 
     //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
     SQLController sqlController = SQLController.getInstance();
-    List<ReportByNumberInCity> allCities = new ArrayList<>();
 
     String statementString = String.join(System.getProperty("line.separator"),
         "",
@@ -42,23 +46,26 @@ public class ReportRepository {
     ResultSet resultSet = cityCountStatement.executeQuery();
 
     while (resultSet.next()) {
-      ReportByNumberInCity cityandnum= new ReportByNumberInCity();
-      cityandnum.setCityName(resultSet.getString("City"));
-      cityandnum.setNumber(resultSet.getInt("Numlistings"));
+      resultSet.getString("City");
+      System.out.println("City: " + resultSet.getString("City")
+          + " Number : " + resultSet.getInt("Numlistings"));
 
-      allCities.add(cityandnum);
     }
-
-    return allCities;
   }
 
 
-  public static List<ReportByNumberInCity> reportByDateRangeInCityWithPostalCode
-      (String startDate, String endDate, String postCode) throws SQLException {
+  /**
+   *
+   * @param startDate
+   * @param endDate
+   * @param postCode
+   * @throws SQLException
+   */
+  public static void reportByDateRangeInCityWithPostalCode
+  (String startDate, String endDate, String postCode) throws SQLException {
 
     //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
     SQLController sqlController = SQLController.getInstance();
-    List<ReportByNumberInCity> allCities = new ArrayList<>();
 
     String statementString = String.join(System.getProperty("line.separator"),
         "",
@@ -87,13 +94,236 @@ public class ReportRepository {
     ResultSet resultSet = cityCountStatement.executeQuery();
 
     while (resultSet.next()) {
-      ReportByNumberInCity cityandnum= new ReportByNumberInCity();
-      cityandnum.setCityName(resultSet.getString("City"));
-      cityandnum.setNumber(resultSet.getInt("Numlistings"));
+      resultSet.getString("City");
+      System.out.println("City: " + resultSet.getString("City")
+          + " Number : " + resultSet.getInt("Numlistings"));
 
-      allCities.add(cityandnum);
     }
-
-    return allCities;
   }
+
+  /****************************************************************************
+   *
+   ****************************************************************************/
+
+
+  /**
+   *
+   * @throws SQLException
+   */
+  public static void reportlistingpercountry() throws SQLException {
+
+    //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
+    SQLController sqlController = SQLController.getInstance();
+    String countryName;
+
+    String statementString = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT ",
+        "    Address.Country, COUNT(Address.Country) AS Numlistings",
+        "FROM",
+        "    Listing",
+        "    INNER JOIN LocatedAt",
+        "    INNER JOIN Address",
+        "    INNER JOIN Availability",
+        "WHERE",
+        "    LocatedAt.Country = Address.Country",
+        "    AND LocatedAt.PostalCode = Address.PostalCode",
+        "    AND Listing.ListingID = LocatedAt.ListingID",
+        "    AND Availability.ListingID = LocatedAt.ListingID",
+        "GROUP BY Country",
+        ";");
+    PreparedStatement countryCountStatement = sqlController
+        .prepareStatement(statementString);
+    ResultSet resultSet = countryCountStatement.executeQuery();
+
+    while (resultSet.next()) {
+      countryName = resultSet.getString("Country");
+      System.out.println("Country: " + countryName
+          + " Amount: " + resultSet.getInt("Numlistings"));
+    }
+  }
+
+
+  /**
+   *
+   * @throws SQLException
+   */
+  public static void reportlistingpercountryandcity() throws SQLException {
+
+    //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
+    SQLController sqlController = SQLController.getInstance();
+    String countryName;
+
+    String statementString = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT ",
+        "    Address.Country, COUNT(Address.Country) AS Numlistings",
+        "FROM",
+        "    Listing",
+        "    INNER JOIN LocatedAt",
+        "    INNER JOIN Address",
+        "    INNER JOIN Availability",
+        "WHERE",
+        "    LocatedAt.Country = Address.Country",
+        "    AND LocatedAt.PostalCode = Address.PostalCode",
+        "    AND Listing.ListingID = LocatedAt.ListingID",
+        "    AND Availability.ListingID = LocatedAt.ListingID",
+        "GROUP BY Country",
+        ";");
+    PreparedStatement countryCountStatement = sqlController
+        .prepareStatement(statementString);
+    ResultSet resultSet = countryCountStatement.executeQuery();
+
+    while (resultSet.next()) {
+      countryName = resultSet.getString("Country");
+      System.out.println("Country: " + countryName
+          + " Amount: " + resultSet.getInt("Numlistings"));
+
+      String statementStringCity = String.join(System.getProperty("line"
+              + ".separator"),
+          "",
+          "SELECT ",
+          "    Address.City, COUNT(Address.City) AS NumlistingsForCity",
+          "FROM",
+          "    Listing",
+          "    INNER JOIN LocatedAt",
+          "    INNER JOIN Address",
+          "    INNER JOIN Availability",
+          "WHERE",
+          "    LocatedAt.Country = Address.Country",
+          "    AND LocatedAt.PostalCode = Address.PostalCode",
+          "    AND Listing.ListingID = LocatedAt.ListingID",
+          "    AND Availability.ListingID = LocatedAt.ListingID",
+          "    AND LocatedAt.Country = ?",
+          "GROUP BY City",
+          ";");
+
+      PreparedStatement getBookingStatementCity = sqlController
+          .prepareStatement(statementStringCity);
+      getBookingStatementCity.setString(1, countryName);
+      ResultSet resultSetCity = getBookingStatementCity.executeQuery();
+      while (resultSetCity.next()) {
+        System.out.println("    City Name: " + resultSetCity.getString("City")
+            + " Amount: " + resultSetCity.getInt("NumlistingsForCity"));
+      }
+    }
+  }
+
+
+  /**
+   * Christ, look at what you did to my boy... this garbage fire of code
+   */
+  public static void reportlistingpercountryandcityandpostal() throws
+      SQLException {
+
+    //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
+    SQLController sqlController = SQLController.getInstance();
+    String countryName;
+    String cityName;
+    String stringtoprint;
+
+
+    String statementString = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT ",
+        "    Address.Country, COUNT(Address.Country) AS Numlistings",
+        "FROM",
+        "    Listing",
+        "    INNER JOIN LocatedAt",
+        "    INNER JOIN Address",
+        "    INNER JOIN Availability",
+        "WHERE",
+        "    LocatedAt.Country = Address.Country",
+        "    AND LocatedAt.PostalCode = Address.PostalCode",
+        "    AND Listing.ListingID = LocatedAt.ListingID",
+        "    AND Availability.ListingID = LocatedAt.ListingID",
+        "GROUP BY Country",
+        ";");
+    PreparedStatement countryCountStatement = sqlController
+        .prepareStatement(statementString);
+    ResultSet resultSet = countryCountStatement.executeQuery();
+
+    while (resultSet.next()) {
+      try {
+        System.out.println("Ayy3");
+        stringtoprint = "";
+        countryName = resultSet.getString("Country");
+        stringtoprint = ("Country: " + countryName
+            + " Amount: " + resultSet.getInt("Numlistings") +"\n");
+
+        String statementStringCity = String.join(System.getProperty("line"
+                + ".separator"),
+            "",
+            "SELECT ",
+            "    Address.City, COUNT(Address.City) AS NumlistingsForCity",
+            "FROM",
+            "    Listing",
+            "    INNER JOIN LocatedAt",
+            "    INNER JOIN Address",
+            "    INNER JOIN Availability",
+            "WHERE",
+            "    LocatedAt.Country = Address.Country",
+            "    AND LocatedAt.PostalCode = Address.PostalCode",
+            "    AND Listing.ListingID = LocatedAt.ListingID",
+            "    AND Availability.ListingID = LocatedAt.ListingID",
+            "    AND LocatedAt.Country = ?",
+            "GROUP BY City",
+            ";");
+
+        PreparedStatement getBookingStatementCity = sqlController
+            .prepareStatement(statementStringCity);
+        getBookingStatementCity.setString(1, countryName);
+        ResultSet resultSetCity = getBookingStatementCity.executeQuery();
+        while (resultSetCity.next()) {
+          cityName = resultSetCity.getString("City");
+          stringtoprint +=
+              ("    City Name: " + cityName + " Amount: "
+                  + resultSetCity.getInt("NumlistingsForCity") + "\n");
+
+          String statementStringPostal = String.join(System.getProperty("line"
+                  + ".separator"),
+              "",
+              "SELECT ",
+              "    Address.PostalCode, COUNT(Address.PostalCode) AS "
+                  + "NumlistingsForPostal",
+              "FROM",
+              "    Listing",
+              "    INNER JOIN LocatedAt",
+              "    INNER JOIN Address",
+              "    INNER JOIN Availability",
+              "WHERE",
+              "    LocatedAt.Country = Address.Country",
+              "    AND LocatedAt.PostalCode = Address.PostalCode",
+              "    AND Listing.ListingID = LocatedAt.ListingID",
+              "    AND Availability.ListingID = LocatedAt.ListingID",
+              "    AND LocatedAt.Country = ?",
+              "    AND Address.City = ?",
+              "GROUP BY PostalCode",
+              ";");
+
+          PreparedStatement getBookingStatementPostal = sqlController
+              .prepareStatement(statementStringPostal);
+          getBookingStatementPostal.setString(1, countryName);
+          getBookingStatementPostal.setString(1, cityName);
+          ResultSet resultSetPostal = getBookingStatementPostal.executeQuery();
+          while (resultSetPostal.next()) {
+            stringtoprint += ("        Postal: "
+                + resultSetPostal.getString("PostalCode")
+                + " Amount: " + resultSetPostal.getInt
+                ("NumlistingsForPostal") + "\n");
+
+
+
+          }
+        }
+        System.out.println("Ayy");
+        System.out.println(stringtoprint);
+      } catch (SQLException exception) {
+        System.out.println("error");
+        continue;
+      }
+      System.out.println("Ayy2");
+    }
+  }
+
 }
