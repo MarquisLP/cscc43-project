@@ -69,7 +69,8 @@ public class FindValidUserRepository {
          */
     String statementString = String.join(System.getProperty("line.separator"),
         "",
-        "SELECT DISTINCT b.SIN, h.SIN, l.ListingID",
+        "SELECT DISTINCT",
+        "    b.SIN, h.SIN, l.ListingID",
         "FROM",
         "    HostedBy AS h",
         "    INNER JOIN Listing AS l",
