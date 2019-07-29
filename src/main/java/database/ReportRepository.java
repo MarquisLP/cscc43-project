@@ -401,7 +401,7 @@ public class ReportRepository {
     String statementString = String.join(System.getProperty("line.separator"),
         "",
         "SELECT ",
-        "    SUM(first.num) AS total",
+        "    SUM(final.num) AS total",
         "FROM",
         "    (SELECT ",
         "        Host.SIN, Address.City, COUNT(Listing.ListingID) AS num",
@@ -449,9 +449,77 @@ public class ReportRepository {
 
     System.out.println("Users with more than 10% in a city:");
     while (resultSet2.next()) {
-      if (resultSet2.getInt("num") >= resultSet.getInt("total")) {
+      resultSet.first();
+      if (((double) (resultSet2.getInt("num")) /
+          (double) (resultSet.getInt("total"))) >= 0.1) {
         System.out.println("SIN: " + resultSet2.getString("SIN") +
             " in " + resultSet2.getString("City") + " with " +
+            resultSet2.getInt("num"));
+      }
+    }
+  }
+
+
+  /**
+   *
+   * @throws SQLException
+   */
+  public static void findUsersWithMoreThanTenPercentByCountry() throws
+      SQLException{
+
+    //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
+    SQLController sqlController = SQLController.getInstance();
+
+    String statementString = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT ",
+        "    SUM(final.num) AS total",
+        "FROM",
+        "    (SELECT ",
+        "        Host.SIN, LocatedAt.Country, COUNT(Listing.ListingID) AS num",
+        "    FROM",
+        "        Listing",
+        "        INNER JOIN HostedBy",
+        "        INNER JOIN LocatedAt",
+        "        INNER JOIN Host",
+        "    WHERE",
+        "        LocatedAt.ListingID = Listing.ListingID",
+        "        AND HostedBy.SIN = Host.SIN",
+        "        AND HostedBy.ListingID = Listing.ListingID",
+        "    GROUP BY Host.SIN, LocatedAt.Country",
+        "    ORDER BY Country ASC, num DESC) AS final",
+        ";");
+    PreparedStatement totalAmount = sqlController
+        .prepareStatement(statementString);
+    ResultSet resultSet = totalAmount.executeQuery();
+
+    String statementString2 = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT ",
+        "    Host.SIN, LocatedAt.Country, COUNT(Listing.ListingID) AS num",
+        "FROM",
+        "    Listing",
+        "    INNER JOIN HostedBy",
+        "    INNER JOIN LocatedAt",
+        "    INNER JOIN Host",
+        "WHERE",
+        "    LocatedAt.ListingID = Listing.ListingID",
+        "    AND HostedBy.SIN = Host.SIN",
+        "    AND HostedBy.ListingID = Listing.ListingID",
+        "GROUP BY Host.SIN, LocatedAt.Country",
+        "ORDER BY Country ASC, num DESC",
+        ";");
+    PreparedStatement eachOne = sqlController
+        .prepareStatement(statementString2);
+    ResultSet resultSet2 = eachOne.executeQuery();
+
+    System.out.println("Users with more than 10% in a country:");
+    while (resultSet2.next()) {
+      resultSet.first();
+      if (((double) (resultSet2.getInt("num")) /
+          (double) (resultSet.getInt("total"))) >= 0.1) {
+        System.out.println("SIN: " + resultSet2.getString("SIN") +
+            " in " + resultSet2.getString("Country") + " with " +
             resultSet2.getInt("num"));
       }
     }
