@@ -121,6 +121,9 @@ CREATE TABLE RenterReview (
     FOREIGN KEY (HostSIN) REFERENCES Host(SIN)
 );
 
+/* Triggers */
+
+-- Prevents deletion of a listing if it has future non-cancelled bookings.
 DELIMITER //
 CREATE TRIGGER DeleteListingChecker BEFORE DELETE ON Listing
     FOR EACH ROW
@@ -133,6 +136,7 @@ CREATE TRIGGER DeleteListingChecker BEFORE DELETE ON Listing
             WHERE
                 b.ListingID = OLD.ListingID 
                 AND b.Cancelled = 0
+                AND b.StartDate > CURRENT_TIMESTAMP
         )
         THEN
             SIGNAL SQLSTATE '45000'
@@ -141,11 +145,16 @@ CREATE TRIGGER DeleteListingChecker BEFORE DELETE ON Listing
     END//
 DELIMITER ;
 
+-- Prevents insertion of a listing review if:
+--     - rating is not between 1 and 5
+--     - the given renter has never booked that listing in the past.
 DELIMITER //
 CREATE TRIGGER InsertListingReviewChecker BEFORE INSERT ON ListingReview
     FOR EACH ROW
     BEGIN
-        IF NOT EXISTS (
+        IF (NEW.Rating < 1)
+        OR (NEW.Rating > 5)
+        OR NOT EXISTS (
             SELECT
                 *
             FROM
@@ -167,11 +176,31 @@ CREATE TRIGGER InsertListingReviewChecker BEFORE INSERT ON ListingReview
     END//
 DELIMITER ;
 
+-- Prevents updating of a listing review if:
+--     - rating is not between 1 and 5
+DELIMITER //
+CREATE TRIGGER UpdateListingReviewChecker BEFORE UPDATE ON ListingReview
+    FOR EACH ROW
+    BEGIN
+        IF (NEW.Rating < 1)
+        OR (NEW.Rating > 5)
+        THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'REJECTED';
+        END IF;
+    END//
+DELIMITER ;
+
+-- Prevents insertion of a host review if:
+--     - rating is not between 1 and 5
+--     - the given renter has never rented from the host before
 DELIMITER //
 CREATE TRIGGER InsertHostReviewChecker BEFORE INSERT ON HostReview
     FOR EACH ROW
     BEGIN
-        IF NOT EXISTS (
+        IF (NEW.Rating < 1)
+        OR (NEW.Rating > 5)
+        OR NOT EXISTS (
             SELECT
                 *
             FROM
@@ -195,11 +224,31 @@ CREATE TRIGGER InsertHostReviewChecker BEFORE INSERT ON HostReview
     END//
 DELIMITER ;
 
+-- Prevents updating of a host review if:
+--     - rating is not between 1 and 5
+DELIMITER //
+CREATE TRIGGER UpdateHostReviewChecker BEFORE UPDATE ON HostReview
+    FOR EACH ROW
+    BEGIN
+        IF (NEW.Rating < 1)
+        OR (NEW.Rating > 5)
+        THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'REJECTED';
+        END IF;
+    END//
+DELIMITER ;
+
+-- Prevents insertion of a renter review if:
+--     - rating is not between 1 and 5
+--     - the given renter has never rented from the host before
 DELIMITER //
 CREATE TRIGGER InsertRenterReviewChecker BEFORE INSERT ON RenterReview
     FOR EACH ROW
     BEGIN
-        IF NOT EXISTS (
+        IF (NEW.Rating < 1)
+        OR (NEW.Rating > 5)
+        OR NOT EXISTS (
             SELECT
                 *
             FROM
@@ -223,6 +272,41 @@ CREATE TRIGGER InsertRenterReviewChecker BEFORE INSERT ON RenterReview
     END//
 DELIMITER ;
 
+-- Prevents updating of a renter review if:
+--     - rating is not between 1 and 5
+DELIMITER //
+CREATE TRIGGER UpdateRenterReviewChecker BEFORE UPDATE ON RenterReview
+    FOR EACH ROW
+    BEGIN
+        IF (NEW.Rating < 1)
+        OR (NEW.Rating > 5)
+        THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'REJECTED';
+        END IF;
+    END//
+DELIMITER ;
+
+-- Prevents insertion of an availability if
+--    - Price is non-positive
+--    - StartDate is after EndDate
+DELIMITER //
+CREATE TRIGGER InsertAvailabilityChecker BEFORE INSERT ON Availability
+    FOR EACH ROW
+    BEGIN
+        IF
+            NEW.Price <= 0
+            OR (NEW.StartDate >= NEW.EndDate)
+        THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'REJECTED';
+        END IF;
+    END//
+DELIMITER ;
+
+-- Prevents update of an availability if
+--    - Price is non-positive
+--    - StartDate is after EndDate
 DELIMITER //
 CREATE TRIGGER UpdateAvailabilityChecker BEFORE UPDATE ON Availability
     FOR EACH ROW
@@ -238,6 +322,8 @@ CREATE TRIGGER UpdateAvailabilityChecker BEFORE UPDATE ON Availability
                 AND b.EndDate = OLD.EndDate
                 AND b.Cancelled = 0
         )
+        OR NEW.Price <= 0
+        OR (NEW.StartDate >= NEW.EndDate)
         THEN
             SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'REJECTED';
@@ -245,6 +331,45 @@ CREATE TRIGGER UpdateAvailabilityChecker BEFORE UPDATE ON Availability
     END//
 DELIMITER ;
 
+-- Prevents insertion of amenities if any amount is less than 0
+DELIMITER //
+CREATE TRIGGER InsertAmenitiesChecker BEFORE INSERT ON Amenities
+    FOR EACH ROW
+    BEGIN
+        IF
+            (NEW.NumberOfGuests <= 0)
+            OR (NEW.Bathrooms <= 0)
+            OR (NEW.Bathrooms <= 0)
+            OR (NEW.Bedrooms <= 0)
+            OR (NEW.Beds <= 0)
+            OR (NEW.ParkingSpots <= 0)
+        THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'REJECTED';
+        END IF;
+    END//
+DELIMITER ;
+
+-- Prevents update of amenities if any amount is less than 0
+DELIMITER //
+CREATE TRIGGER UpdateAmenitiesChecker BEFORE UPDATE ON Amenities
+    FOR EACH ROW
+    BEGIN
+        IF
+            (NEW.NumberOfGuests <= 0)
+            OR (NEW.Bathrooms <= 0)
+            OR (NEW.Bathrooms <= 0)
+            OR (NEW.Bedrooms <= 0)
+            OR (NEW.Beds <= 0)
+            OR (NEW.ParkingSpots <= 0)
+        THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'REJECTED';
+        END IF;
+    END//
+DELIMITER ;
+
+-- Prevents deletion of a host if they possess any listings
 DELIMITER //
 CREATE TRIGGER DeleteHostChecker BEFORE DELETE ON User
     FOR EACH ROW
@@ -266,6 +391,8 @@ CREATE TRIGGER DeleteHostChecker BEFORE DELETE ON User
     END//
 DELIMITER ;
 
+-- Prevents direct deletion from the host table.
+-- (Hosts can only be cascade deleted by deleting corresponding user.)
 DELIMITER //
 CREATE TRIGGER DeleteHostTablePreventer BEFORE DELETE ON Host
     FOR EACH ROW
@@ -275,6 +402,8 @@ CREATE TRIGGER DeleteHostTablePreventer BEFORE DELETE ON Host
     END//
 DELIMITER ;
 
+-- Prevents direct deletion from the renter table.
+-- (Renter can only be cascade deleted by deleting corresponding user.)
 DELIMITER //
 CREATE TRIGGER DeleteRenterTablePreventer BEFORE DELETE ON Renter
     FOR EACH ROW
@@ -283,3 +412,4 @@ CREATE TRIGGER DeleteRenterTablePreventer BEFORE DELETE ON Renter
     SET MESSAGE_TEXT = 'You may not delete from the Renter table directly. Delete from User table instead.';
     END//
 DELIMITER ;
+
