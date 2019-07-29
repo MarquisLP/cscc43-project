@@ -5,10 +5,7 @@ import database.models.Host;
 import database.models.Renter;
 import database.models.User;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.util.NoSuchElementException;
 
 public class UserRepository {
@@ -171,7 +168,14 @@ public class UserRepository {
     insertAddressStatement.setString(1, newUser.getAddress().getPostalCode());
     insertAddressStatement.setString(2, newUser.getAddress().getCity());
     insertAddressStatement.setString(3, newUser.getAddress().getCountry());
-    insertAddressStatement.executeUpdate();
+    try {
+      insertAddressStatement.executeUpdate();
+    } catch (SQLIntegrityConstraintViolationException exception) {
+        // If the address is a duplicate, ignore error and prevent it from being inserted
+        if (!(exception.getMessage().contains("Duplicate"))) {
+          throw exception;
+        }
+    }
 
     // Now we insert into the User table.
     statementString = String.join(System.getProperty("line.separator"),
