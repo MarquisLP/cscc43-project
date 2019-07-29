@@ -35,6 +35,7 @@ public class RenterMenu {
       System.out.println("1: See Listings (and Book)");
       System.out.println("2: Cancel a Booking or see cancelled bookings");
       System.out.println("3: Leave a review");
+      System.out.println("4: Delete my account");
 
       input = sc.nextLine();
       try {
@@ -60,6 +61,9 @@ public class RenterMenu {
         case 3:
           // 3: Leave a review
           RentersReviewMenu.RentersReviewStuffandWhatnot(renter);
+          break;
+        case 4:
+          DeleteRenterMenu.deleteRenter(renter);
           break;
         default:
           System.out.println("Invalid option\n");
