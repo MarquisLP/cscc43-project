@@ -236,7 +236,7 @@ public class ReviewRepository {
    * @throws IllegalAccessException
    */
   public static List<UserReview> getAllHostReviewsByHostSin(String hostsin)
-      throws SQLException, IllegalAccessException {
+      throws SQLException {
 
     //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
     SQLController sqlController = SQLController.getInstance();
