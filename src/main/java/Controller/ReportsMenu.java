@@ -27,7 +27,9 @@ public class ReportsMenu {
             System.out.println("5. Total number of listings by city, country, and postal code");
             System.out.println("6. Ranking of hosts by number of listings per country");
             System.out.println("7. Ranking of hosts by number of listings per city");
-            System.out.println("8. Hosts who have more than 10% of all listings in city and country");
+            System.out.println("8. Hosts who have more than 10% of all listings in city");
+            System.out.println("9. Hosts who have more than 10% of all "
+                + "listings in country");
 
             System.out.print("Enter the number of one of the options above: ");
             input = sc.nextLine();
@@ -141,6 +143,21 @@ public class ReportsMenu {
                         System.out.println("An error occurred. Please contact your administrator for help.");
                     }
                     break;
+                case "8":
+                    try {
+                        ReportRepository.findUsersWithMoreThanTenPercentByCity();
+                    } catch (SQLException exception) {
+                        exception.printStackTrace();
+                        System.out.println("An error occurred. Please contact your administrator for help.");
+                    }
+                case "9":
+                    try {
+                        ReportRepository.findUsersWithMoreThanTenPercentByCountry();
+                    } catch (SQLException exception) {
+                        exception.printStackTrace();
+                        System.out.println("An error occurred. Please contact your administrator for help.");
+                    }
+                break;
                 default:
                     break;
             }
