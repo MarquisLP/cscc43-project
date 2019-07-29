@@ -125,8 +125,6 @@ public class CancelListingsMenu {
 
     try {
       BookingRepository.cancelBooking(listingId, startTime, endTime, renter);
-      System.out.println("Listing cancelled! ID: " + listingId + " from " +
-          startTime + " to " + endTime);
     } catch (SQLException exception) {
       System.out.println("SQL exception");
     } catch (NoSuchElementException exception) {

@@ -180,6 +180,8 @@ public class BookingRepository {
         "    AND Booking.StartDate = ?",
         "    AND Booking.EndDate = ?",
         "    AND Booking.SIN = ?",
+        "    AND Booking.EndDate >= CURRENT_TIMESTAMP",
+        "    AND Booking.StartDate >= CURRENT_TIMESTAMP",
         ";");
     PreparedStatement updateBookingStatement = sqlController
         .prepareStatement(statementString);
