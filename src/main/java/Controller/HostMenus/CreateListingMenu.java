@@ -48,7 +48,7 @@ public class CreateListingMenu {
                 + 25 * amenities.getKitchen()
                 + 20 * amenities.getParkingSpots()
         );
-        System.out.println("Suggested price for your listing: $" + suggestedPrice);
+        System.out.println("Suggested price for each availability of your listing: $" + suggestedPrice);
 
         // Availabilities
         List<Availability> availabilities = getAvailabilities(sc);
