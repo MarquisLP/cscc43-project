@@ -388,5 +388,73 @@ public class ReportRepository {
     }
   }
 
+  /***********************************************************************
+   *
+   **********************************************************************/
+
+  public static void findUsersWithMoreThanTenPercentByCity() throws
+      SQLException{
+
+    //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
+    SQLController sqlController = SQLController.getInstance();
+
+    String statementString = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT ",
+        "    SUM(first.num) AS total",
+        "FROM",
+        "    (SELECT ",
+        "        Host.SIN, Address.City, COUNT(Listing.ListingID) AS num",
+        "    FROM",
+        "        Listing",
+        "        INNER JOIN HostedBy",
+        "        INNER JOIN LocatedAt",
+        "        INNER JOIN Host",
+        "        INNER JOIN Address",
+        "    WHERE",
+        "        LocatedAt.ListingID = Listing.ListingID",
+        "        AND HostedBy.SIN = Host.SIN",
+        "        AND HostedBy.ListingID = Listing.ListingID",
+        "        AND Address.PostalCode = LocatedAt.PostalCode",
+        "        AND Address.Country = LocatedAt.Country",
+        "    GROUP BY Host.SIN, Address.City",
+        "    ORDER BY City ASC, num DESC) AS final",
+        ";");
+    PreparedStatement totalAmount = sqlController
+        .prepareStatement(statementString);
+    ResultSet resultSet = totalAmount.executeQuery();
+
+    String statementString2 = String.join(System.getProperty("line.separator"),
+        "",
+        "SELECT ",
+        "    Host.SIN, Address.City, COUNT(Listing.ListingID) AS num",
+        "FROM",
+        "    Listing",
+        "    INNER JOIN HostedBy",
+        "    INNER JOIN LocatedAt",
+        "    INNER JOIN Host",
+        "    INNER JOIN Address",
+        "WHERE",
+        "    LocatedAt.ListingID = Listing.ListingID",
+        "    AND HostedBy.SIN = Host.SIN",
+        "    AND HostedBy.ListingID = Listing.ListingID",
+        "    AND Address.PostalCode = LocatedAt.PostalCode",
+        "    AND Address.Country = LocatedAt.Country",
+        "GROUP BY Host.SIN, Address.City",
+        "ORDER BY City ASC, num DESC",
+        ";");
+    PreparedStatement eachOne = sqlController
+        .prepareStatement(statementString2);
+    ResultSet resultSet2 = eachOne.executeQuery();
+
+    System.out.println("Users with more than 10% in a city:");
+    while (resultSet2.next()) {
+      if (resultSet2.getInt("num") >= resultSet.getInt("total")) {
+        System.out.println("SIN: " + resultSet2.getString("SIN") +
+            " in " + resultSet2.getString("City") + " with " +
+            resultSet2.getInt("num"));
+      }
+    }
+  }
 
 }
