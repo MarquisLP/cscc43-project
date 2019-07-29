@@ -30,7 +30,9 @@ public class HostRepository {
             throws SQLException, IllegalArgumentException, NoSuchElementException {
         String statementString = String.join(System.getProperty("line.separator"),
                 "",
-                "DELETE FROM",
+                "DELETE",
+                "   l",
+                "FROM",
                 "    Listing AS l",
                 "    INNER JOIN HostedBy AS h ON h.ListingID = l.ListingID",
                 "WHERE",
