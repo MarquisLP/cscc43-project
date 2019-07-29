@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
+import java.util.TimeZone;
 
 public class AddAvailabilityMenu {
     public static void addAvailability(Host host) {
@@ -39,7 +40,7 @@ public class AddAvailabilityMenu {
             String listingId = fields[0];
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            //dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
             Timestamp startDate;
             try {
                 startDate = new Timestamp((dateFormat.parse(fields[1]).getTime()));
