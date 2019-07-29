@@ -31,7 +31,6 @@ public class FindValidUserRepository {
         "WHERE",
         "    b.Cancelled = 0",
         "    AND h.SIN = ?",
-        "    AND Availability.EndDate = ?",
         "    AND b.EndData < CURRENT_TIMESTAMP",
         ";");
     PreparedStatement getAvailabilityStatement = sqlController
