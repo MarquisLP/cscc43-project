@@ -50,4 +50,11 @@ public class UserReview {
   public void setRating(int rating) {
     this.rating = rating;
   }
+
+  public String toString() {
+    return ("hostSIN = " + hostSin +
+        "\nrenterSin = " + renterSin +
+        "\ncomment = " + comment +
+        "\nrating = " + rating);
+  }
 }

@@ -35,7 +35,7 @@ public class RentersReviewMenu {
 
       System.out.println("Choose one of the following:");
       System.out.println("0: Return to main menu");
-      System.out.println("1: Make a review");
+      System.out.println("1: See all listings and hosts to leave reviews on");
       System.out.println("2: Cancel a booking");
       System.out.println("3: See cancelled bookings");
 

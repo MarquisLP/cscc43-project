@@ -52,4 +52,11 @@ public class ListingReview {
     this.rating = rating;
   }
 
+
+  public String toString() {
+    return ("listingID = " + listingID +
+        "\nrenterSin = " + renterSin +
+        "\ncomment = " + comment +
+        "\nrating = " + rating);
+  }
 }
