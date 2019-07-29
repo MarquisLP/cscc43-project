@@ -1,5 +1,6 @@
 package Controller.RenterMenus;
 
+import Controller.ReportsMenu;
 import database.SQLController;
 import database.models.Renter;
 import java.util.Scanner;
@@ -36,6 +37,7 @@ public class RenterMenu {
       System.out.println("2: Cancel a Booking or see cancelled bookings");
       System.out.println("3: Leave a review");
       System.out.println("4: Delete my account");
+      System.out.println("5: View reports");
 
       input = sc.nextLine();
       try {
@@ -64,6 +66,9 @@ public class RenterMenu {
           break;
         case 4:
           DeleteRenterMenu.deleteRenter(renter);
+          break;
+        case 5:
+          ReportsMenu.reportsMenu();
           break;
         default:
           System.out.println("Invalid option\n");

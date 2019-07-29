@@ -1,5 +1,6 @@
 package Controller.HostMenus;
 
+import Controller.ReportsMenu;
 import database.models.Host;
 
 import java.util.Scanner;
@@ -49,6 +50,7 @@ public class HostMenu {
                     ViewHostReviewsMenu.viewHostReviews(host);
                     break;
                 case "7":
+                    ReportsMenu.reportsMenu();
                     break;
                 case "8":
                     DeleteHostMenu.deleteHost(host);
