@@ -31,7 +31,7 @@ public class ReviewRepository {
    * @throws IllegalAccessException
    */
   public static void createListingReview(String listingID, String sin, String
-      comment, int rating) throws SQLException, IllegalAccessException {
+      comment, int rating) throws SQLException {
 
     //INSERTS into LISTINGREVIEW Table
     try {
@@ -74,7 +74,7 @@ public class ReviewRepository {
    * @throws IllegalAccessException
    */
   public static void createHostReview(String hostSin, String renterSin, String
-      comment, int rating) throws SQLException, IllegalAccessException {
+      comment, int rating) throws SQLException {
 
     //INSERTS into HOSTREVIEW Table
     try {
@@ -118,7 +118,7 @@ public class ReviewRepository {
    * @throws IllegalAccessException
    */
   public static void createRenterReview(String hostSin, String renterSin, String
-      comment, int rating) throws SQLException, IllegalAccessException {
+      comment, int rating) throws SQLException {
 
     //INSERTS into RENTERREVIEW Table
     try {
@@ -160,7 +160,7 @@ public class ReviewRepository {
    * @throws IllegalAccessException
    */
   public static List<ListingReview> getAllLsitingReviewsByListingId(String
-      listingID) throws SQLException, IllegalAccessException {
+      listingID) throws SQLException {
 
     //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
     SQLController sqlController = SQLController.getInstance();
@@ -194,7 +194,7 @@ public class ReviewRepository {
   }
 
   public static List<ListingReview> getAllListingReviewsByRenterSin(String
-      renterSin) throws SQLException, IllegalAccessException {
+      renterSin) throws SQLException {
 
     //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
     SQLController sqlController = SQLController.getInstance();
@@ -236,7 +236,7 @@ public class ReviewRepository {
    * @throws IllegalAccessException
    */
   public static List<UserReview> getAllHostReviewsByHostSin(String hostsin)
-      throws SQLException, IllegalAccessException {
+      throws SQLException {
 
     //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
     SQLController sqlController = SQLController.getInstance();
@@ -271,7 +271,7 @@ public class ReviewRepository {
 
 
   public static List<UserReview> getAllHostReviewsByRenterSin(String renterSin)
-      throws SQLException, IllegalAccessException {
+      throws SQLException {
 
     //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
     SQLController sqlController = SQLController.getInstance();
@@ -313,7 +313,7 @@ public class ReviewRepository {
    * @throws IllegalAccessException
    */
   public static List<UserReview> getAllRenterReviewsByRenterSin(String
-      renterSin) throws SQLException, IllegalAccessException {
+      renterSin) throws SQLException {
 
     //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
     SQLController sqlController = SQLController.getInstance();
@@ -355,7 +355,7 @@ public class ReviewRepository {
    * @throws IllegalAccessException
    */
   public static List<UserReview> getAllRenterReviewsByHostSin(String
-      hostSin) throws SQLException, IllegalAccessException {
+      hostSin) throws SQLException {
 
     //SELECTS all LISTINGREVIEW from Table that match the listing ID provided
     SQLController sqlController = SQLController.getInstance();
