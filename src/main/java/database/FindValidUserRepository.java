@@ -21,17 +21,17 @@ public class FindValidUserRepository {
          */
     String statementString = String.join(System.getProperty("line.separator"),
         "",
-        "SELECT",
-        "    *",
+        "SELECT DISTINCT",
+        "    b.SIN, h.SIN, l.ListingID",
         "FROM",
         "    HostedBy AS h",
-        "    INNER_JOIN Listing AS l",
+        "    INNER JOIN Listing AS l",
         "    INNER JOIN Availability AS a",
         "    INNER JOIN Booking AS b",
         "WHERE",
         "    b.Cancelled = 0",
         "    AND h.SIN = ?",
-        "    AND b.EndData < CURRENT_TIMESTAMP",
+        "    AND b.EndDate < CURRENT_TIMESTAMP",
         ";");
     PreparedStatement getAvailabilityStatement = sqlController
         .prepareStatement(statementString);
