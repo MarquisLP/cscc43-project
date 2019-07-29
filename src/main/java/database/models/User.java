@@ -11,7 +11,7 @@ public class User {
     Date dateOfBirth;
     Address address;
 
-    public User(String sin, String name, @Nullable Date dateOfBirth, String occupation, Address address) {
+    public User(String sin, String name, Date dateOfBirth, String occupation, Address address) {
         this.sin = sin;
         this.name = name;
         this.occupation = occupation;

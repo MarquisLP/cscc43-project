@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 /*
  * Code copied and modified from CommandLine.java provided on the CSCC43 course website.
@@ -233,16 +234,27 @@ public class CommandLine {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     boolean dateOfBirthChosen = false;
     while (!(dateOfBirthChosen)) {
-      System.out.print("Enter date of birth in YYYY-MM-DD format (optional): ");
+      System.out.print("Enter date of birth in YYYY-MM-DD format: ");
       dateOfBirthString = sc.nextLine();
-      if (dateOfBirthString.length() == 0) {
-        dateOfBirthChosen = true;
-      } else {
-        try {
-          dateOfBirth = new Date(dateFormat.parse(dateOfBirthString).getTime());
+      if (dateOfBirthString.equals("")) {
+        System.out.println("Date of birth is required");
+        continue;
+      }
+      try {
+        dateOfBirth = new Date(dateFormat.parse(dateOfBirthString).getTime());
+      } catch (ParseException exception) {
+        System.out.println("Invalid date format. Please try again.");
+      }
+      if (dateOfBirth != null) {
+        TimeUnit days = TimeUnit.DAYS;
+        int ageLimitInDays = 365 * 18;
+        long ageInMilliseconds = (new java.util.Date()).getTime() - dateOfBirth.getTime();
+        if (days.convert(ageInMilliseconds, TimeUnit.MILLISECONDS) < ageLimitInDays) {
+            System.out.println("You must be at least 18 years of age to use this service.");
+            return false;
+        }
+        else {
           dateOfBirthChosen = true;
-        } catch (ParseException exception) {
-          System.out.println("Invalid date format. Please try again.");
         }
       }
     }
